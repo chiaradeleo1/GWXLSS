@@ -1,0 +1,21 @@
+aliases: [LSS]
+speed: 500
+params:
+  A_IA: 1.72
+  eta_IA: -0.41
+  beta_IA: 2.17
+  b0_poly: 0.830703
+  b1_poly: 1.190547
+  b2_poly: -0.928357
+  b3_poly: 0.423292
+k_max_extrap: 1000000.0
+k_min_extrap: 0.00001
+stop_at_error : False
+use_obs: 
+  GC: True
+  WL: True
+  GW: True
+path:
+datapath: 
+use_Weyl: False
+
