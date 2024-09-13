@@ -1,0 +1,2 @@
+#        weight    minuslogpost           ombh2           omch2              ns              H0            logA       EFTOmega0     EFTOmegaExp              As          omegab          omegam   minuslogprior minuslogprior__0            chi2       chi2__LSS
+              1       19815.455     0.022221386      0.12022174      0.95752648       67.237548       2.9554665    -0.018930471       0.6502396   1.9210682e-09     0.049152703      0.31507776      0.36818794       0.36818794       39630.174       39630.174
