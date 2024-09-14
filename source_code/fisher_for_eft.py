@@ -41,18 +41,27 @@ class get_Fisher:
             for param in self.param_names }
         
         for i, (param, delta) in enumerate(zip(self.param_names, self.param_deltas)):
+            print('Computing derivative for {}'.format(param))
             fiducial_plus = copy.deepcopy(self.fiducial)
             fiducial_minus = copy.deepcopy(self.fiducial)
+
+            
             extra_plus = copy.deepcopy(self.obs_settings['extra'])
             extra_minus = copy.deepcopy(self.obs_settings['extra'])
 
             if param in self.obs_settings['extra']:
-                epsilon = self.obs_settings['extra'][param] * delta
+                if self.obs_settings['extra'][param] == 0:
+                    epsilon = delta
+            else:
+                epsilon = abs(self.obs_settings['extra'][param])*delta
                 extra_plus[param] += epsilon
                 extra_minus[param] -= epsilon
 
             if param in self.fiducial:
-                epsilon = self.fiducial[param] * delta
+                if self.fiducial[param] == 0:
+                    epsilon = delta
+            else:
+                epsilon = abs(self.fiducial[param])*delta
                 fiducial_plus[param] += epsilon
                 fiducial_minus[param] -= epsilon
             #print(param,fiducial_plus, fiducial_minus,extra_plus , extra_minus)                
@@ -82,6 +91,7 @@ class get_Fisher:
 
 
     def get_cls_noisy(self):
+        
         ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.numbins)*3600*(180/np.pi)**2
         calc_obs= get_obs(self.fiducial,self.obs_settings['extra'], self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], feedback=False)
         eps_error = self.galaxy_specs['sigma_eps']
@@ -105,7 +115,7 @@ class get_Fisher:
 
 
     def compute_covmat(self):
-        
+        print('Computing covmat')
         noisy_cls=self.get_cls_noisy()
         covmat = []
         

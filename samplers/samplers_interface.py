@@ -91,54 +91,33 @@ def nautilus_interface(info):
 
     return results
 
-def emcee_interface(info):
+def run_fisher(info):
 
-    #MMmod: to be finished
-    #- generalize prior
-    #- it doesn't output anything :(
+    lmin = np.log10(info['analysis_settings']['lmin'])
+    lmax = np.log10(info['analysis_settings']['lmax'])
+    N    = info['analysis_settings']['Nbin_ell']
 
-    from cobaya.run import run
-    import emcee
-    from utils.utils import Suppressor
+    obs_settings = info['obs_settings']
 
-    Nwalk  = info['sampler']['emcee']['Nwalk']
-    Nsteps = info['sampler']['emcee']['Nsteps']
+    if obs_settings['extra'] == None:
+        obs_settings['extra'] = {}
 
-    primary_params = [k for k in info['params'].keys() if (type(info['params'][k]) == dict) and ('prior' in info['params'][k])]
+    ell_lims = np.logspace(lmin,lmax,N) #creation of array-> N bin log spaced
+    ells     = np.array([int(ell) for ell in 0.5*(ell_lims[:-1]+ell_lims[1:])])
+    deltas   = (ell_lims[1:]-ell_lims[:-1]) #evaluation of the amplitude of each bin
 
-    def log_prior(ombh2):
+    distributions = np.load(info['analysis_settings']['dist_path'],allow_pickle=True).item()
+    galaxy_specs  = info['analysis_settings']['galaxy_specs']
 
-        if info['BBN_prior']:
-            prior = -0.5*(ombh2-info['params']['ombh2']['prior']['loc'])**2/info['params']['ombh2']['prior']['scale']**2.
-        else:
-            prior = 0.
+    free_params = info['sampler']['Fisher']['freepars']
 
-        return prior
+    fiducial = {par: pardict['fiducial'] for par,pardict in free_params.items()} | info['sampler']['Fisher']['fixedpars']
 
-    def log_prob(x):
+    from source_code.fisher import get_Fisher
+    fishmat = get_Fisher(fiducial, free_params, ells, deltas, distributions, obs_settings, galaxy_specs).fisher_matrix()
 
-        params = {k:x[i] for i,k in enumerate(primary_params)}
-
-        logprior = log_prior(params['ombh2'])
-
-        info['sampler'] = {'evaluate': {'override': params}}
-        with Suppressor():
-            updated_info, sampler = run(info)
-
-        loglike = sampler.logposterior.loglike
-
-        return loglike+logprior
-
-    pos = np.array([[np.random.normal(loc=info['params'][k]['ref']['loc'],scale=info['params'][k]['ref']['scale']) for k in primary_params] for _ in range(Nwalk)])
-    nwalkers, ndim = pos.shape
-
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, log_prob)
-    sampler.run_mcmc(pos, Nsteps,progress=True)
-
-    test = sampler.get_chain(flat=True)
+    fisher = pd.DataFrame(fishmat,columns=free_params.keys(),index=free_params.keys())
+    params_info = {par: val for par,val in free_params.items()}
 
 
-    samples = pd.DataFrame(sampler.get_chain(flat=True)[0],columns=primary_pars)
-
-
-    return sampler
+    return fisher,params_info

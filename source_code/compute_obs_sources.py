@@ -6,7 +6,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 from scipy.integrate   import trapz
 
-
+from copy      import deepcopy
 from itertools import product
 from time      import time
 
@@ -19,7 +19,10 @@ class get_obs:
         #Reading used observables from source distribution
         #Checking that there is no weird stuff
         self.observables = observables
-        self.params=params
+        self.params = deepcopy(params)
+        if 'logA' in self.params:
+            self.params['As'] = np.exp(self.params.pop('logA'))*1.e-10
+        
         self.extra_params=extra
         self.case=case
         self.camb_path=camb_path

@@ -19,7 +19,7 @@ class get_Fisher:
         self.free_params = free_params
         self.param_names = list(free_params.keys())
         self. param_values = [fiducial[name] for name in self.param_names]
-        self.param_deltas = [free_params[name] for name in self.param_names]
+        self.param_deltas = [free_params[name]['variation'] for name in self.param_names]
         self.obs=[]
         
         if 'GC' in self.observables:
@@ -41,10 +41,16 @@ class get_Fisher:
             for param in self.param_names }
         
         for i, (param, delta) in enumerate(zip(self.param_names, self.param_deltas)):
+            print('Computing derivative for {}'.format(param))
             fiducial_plus = copy.deepcopy(self.fiducial)
             fiducial_minus = copy.deepcopy(self.fiducial)
             
-            epsilon = self.fiducial[param] * delta
+            #MM: added to avoid 0 value epsilons if fiducial is 0
+            if self.fiducial[param] == 0:
+                epsilon = delta
+            else:
+                epsilon = abs(self.fiducial[param])*delta
+            
             fiducial_plus[param] += epsilon
             fiducial_minus[param] -= epsilon
             
@@ -94,6 +100,7 @@ class get_Fisher:
 
 
     def compute_covmat(self):
+        print('Computing covmat')
         
         noisy_cls=self.get_cls_noisy()
         covmat = []
