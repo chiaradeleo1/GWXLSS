@@ -24,6 +24,14 @@ pp = pprint.PrettyPrinter(indent=4)
 
 info     = read(sys.argv[1])
 
+#MMmod: this needs to be changed to be able to use multiple likelihoods at once
+likesets = deepcopy(info['likelihood']['LSS'])
+info['likelihood'] =  {'LSS': {'external': LSSlike,
+                               'data_path': likesets['data_path'],
+                               'debug_mode': likesets['debug_mode'],
+                               'camb_path': likesets['camb_path'],
+                               'use_noiseless_cls': likesets['use_noiseless_cls']}}
+
 #MMmod:
 #creating output folder if it doesn't exist
 directory = os.path.dirname(os.path.abspath(info['output']))
@@ -32,14 +40,6 @@ if not os.path.exists(directory):
     os.makedirs(directory)
 
 if list(info['sampler'].keys())[0] == 'mcmc':
-    #MMmod: this needs to be changed to be able to use multiple likelihoods at once
-    likesets = deepcopy(info['likelihood']['LSS'])
-    info['likelihood'] =  {'LSS': {'external': LSSlike,
-                                   'data_path': likesets['data_path'],
-                                   'debug_mode': likesets['debug_mode'],
-                                   'camb_path': likesets['camb_path'],
-                                   'use_noiseless_cls': likesets['use_noiseless_cls']}}
-    info['sampler']['mcmc']['covmat'] = 'covariance_matrix.covmat'
     updated_info,sampler = run(info)
 elif list(info['sampler'].keys())[0] == 'nautilus':
     nautilus = nautilus_interface(info)
