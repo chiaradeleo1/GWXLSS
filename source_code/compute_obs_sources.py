@@ -80,7 +80,9 @@ class get_obs:
         from   camb         import model, initialpower
         self.z            = np.linspace(0.001,4,500)
         cosmo_pars = cosmo['cosmo_params']
-        print(camb.__path__)
+        
+        #MMmod: removed print below to avoid cluttering
+        #print(camb.__path__)
         if 'eft_params' in cosmo:
             eft_params=cosmo['eft_params']
             #print(eft_params)

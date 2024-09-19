@@ -110,11 +110,12 @@ def run_fisher(info):
     galaxy_specs  = info['analysis_settings']['galaxy_specs']
 
     free_params = info['sampler']['Fisher']['freepars']
+    covmat_type = info['sampler']['Fidher']['covmat']
 
     fiducial = {par: pardict['fiducial'] for par,pardict in free_params.items()} | info['sampler']['Fisher']['fixedpars']
 
     from source_code.fisher import get_Fisher
-    fishmat = get_Fisher(fiducial, free_params, ells, deltas, distributions, obs_settings, galaxy_specs).fisher_matrix()
+    fishmat = get_Fisher(fiducial,free_params,ells,deltas,distributions,obs_settings,galaxy_specs,covmat_type).fisher_matrix()
 
     fisher = pd.DataFrame(fishmat,columns=free_params.keys(),index=free_params.keys())
     params_info = {par: val for par,val in free_params.items()}
