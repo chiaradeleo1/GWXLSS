@@ -1,5 +1,4 @@
-output: chains/DESI_BBN_LCDM_nautilus
-
+output: chains/LCDM_nautilus
 
 
 sampler:

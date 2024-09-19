@@ -1,5 +1,14 @@
 output: chains/3x2pt_LCDM_MH
 
+likelihood:
+  LSS: 
+    external: LSSlike
+    data_path: ./mock_data/EFTflag_1_test_galonly_IApoly
+    debug_mode: False
+    camb_path: /home/matteo/Codes/CAMB/
+    use_noiseless_cls: True
+
+
 sampler:
   mcmc:
     oversample_power: 1
