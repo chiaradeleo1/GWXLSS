@@ -6,7 +6,6 @@ likelihood:
     speed: 500
     case: simple
     extra:
-      EFT_ghost_math_stability: false
       EFT_mass_math_stability: false
       EFT_ghost_stability: false
       EFT_gradient_stability: false
@@ -15,18 +14,16 @@ likelihood:
       EFTflag: 1
       PureEFTmodel: 1
       PureEFTmodelOmega: 3
-      EFTOmega0: -0.019
-      EFTOmegaExp: 0.66
     k_max_extrap: 1000000.0
     k_min_extrap: 1.0e-05
     camb_path: /users/chiaradeleo/Desktop/myeftcamb-main
     data_path: ./mock_data/EFTflag_1_test_galonly_IApoly
     use_noiseless_cls: true
-    debug_mode: false
+    debug_mode: true
     type: []
     stop_at_error: false
     version: null
-    external: !!python/name:source_code.likelihood.LSSlike ''
+    #external: !!python/name:source_code.likelihood.LSSlike ''
     input_params:
     - ombh2
     - omch2
@@ -36,6 +33,8 @@ likelihood:
     - tau
     - omegab
     - omegam
+    - EFTOmega0
+    - EFTOmegaExp
     - a0
     - a1
     - a2
@@ -116,6 +115,26 @@ params:
       ** 2'
     latex: \Omega_\mathrm{m}
     derived: true
+  EFTOmega0:
+    latex: Omega_0
+    prior:
+      min: -0.1
+      max: -0.001
+    proposal: 0.0001
+    ref:
+      dist: norm
+      loc: -0.019
+      scale: 0.0001
+  EFTOmegaExp:
+    latex: \beta
+    prior:
+      min: 0.4
+      max: 1.0
+    proposal: 0.002
+    ref:
+      dist: norm
+      loc: 0.66
+      scale: 0.004
   a0:
     value: -0.007589
   a1:
@@ -141,41 +160,13 @@ params:
   mnu:
     value: 0.06
 sampler:
-  mcmc:
-    burn_in: 0
-    max_tries: 10000
-    covmat:
-      path: covariance_matrix.covmat
-    covmat_params: null
-    proposal_scale: 2.4
-    output_every: 60s
-    learn_every: 40d
-    temperature: 1
-    learn_proposal: true
-    learn_proposal_Rminus1_max: 2.0
-    learn_proposal_Rminus1_max_early: 30.0
-    learn_proposal_Rminus1_min: 0.0
-    max_samples: .inf
-    Rminus1_stop: 0.01
-    Rminus1_cl_stop: 0.2
-    Rminus1_cl_level: 0.95
-    Rminus1_single_split: 4
-    measure_speeds: true
-    oversample_power: 1
-    oversample_thin: true
-    drag: false
-    blocking: null
-    callback_function: null
-    callback_every: null
+  evaluate:
+    N: 1
+    override: null
     seed: null
-    check_every: null
-    oversample: null
-    drag_limits: null
-    fallback_covmat_scale: 4
     version: null
 output: 3x2pt_LCDM_MH
 extra:
-  EFT_ghost_math_stability: false
   EFT_mass_math_stability: false
   EFT_ghost_stability: false
   EFT_gradient_stability: false
@@ -184,24 +175,4 @@ extra:
   EFTflag: 1
   PureEFTmodel: 1
   PureEFTmodelOmega: 3
-  EFTOmega0:
-    latex: Omega_0
-    prior:
-      min: -0.1
-      max: -0.001
-    proposal: 0.0001
-    ref:
-      dist: norm
-      loc: -0.019
-      scale: 0.0001
-  EFTOmegaExp:
-    latex: \beta
-    prior:
-      min: 0.4
-      max: 1.0
-    proposal: 0.002
-    ref:
-      dist: norm
-      loc: 0.66
-      scale: 0.004
-version: '3.3'
+version: 3.5.1

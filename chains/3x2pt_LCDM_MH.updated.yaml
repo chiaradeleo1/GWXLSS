@@ -23,7 +23,7 @@ likelihood:
     type: []
     stop_at_error: false
     version: null
-    external: !!python/name:source_code.likelihood.LSSlike ''
+    #external: !!python/name:source_code.likelihood.LSSlike ''
     input_params:
     - ombh2
     - omch2
