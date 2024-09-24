@@ -110,7 +110,7 @@ def run_fisher(info):
     galaxy_specs  = info['analysis_settings']['galaxy_specs']
 
     free_params = info['sampler']['Fisher']['freepars']
-    covmat_type = info['sampler']['Fidher']['covmat']
+    covmat_type = info['sampler']['Fisher']['covmat']
 
     fiducial = {par: pardict['fiducial'] for par,pardict in free_params.items()} | info['sampler']['Fisher']['fixedpars']
 
