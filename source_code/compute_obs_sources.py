@@ -29,6 +29,9 @@ class get_obs:
         self.ells=ells
         self.zinterps = np.logspace(-3,np.log10(5),500)
         self.k_max_Boltzmann = 10
+
+        #MMmod: switch here if we want to customize
+        self.params['dark_energy_model'] = 'ppf'
         
         for obs in self.observables.keys():
             if obs not in possible_observables:

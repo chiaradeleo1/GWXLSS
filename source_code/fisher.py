@@ -1,4 +1,4 @@
-import sys
+import sys,re
 import numpy  as np
 import pandas as pd
 
@@ -86,19 +86,20 @@ class get_Fisher:
 
 
     def get_cls_noisy(self):
-        ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.numbins)*3600*(180/np.pi)**2
-        calc_obs= get_obs(self.fiducial,self.obs_settings['extra'], self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], feedback=False)
-        eps_error = self.galaxy_specs['sigma_eps']
-        noisy_cls =  copy.deepcopy(calc_obs.Cls)
+        ngalbin_gc = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_gc)*3600*(180/np.pi)**2
+        ngalbin_wl = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_wl)*3600*(180/np.pi)**2
+        calc_obs   = get_obs(self.fiducial,self.obs_settings['extra'], self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], feedback=False)
+        eps_error  = self.galaxy_specs['sigma_eps']
+        noisy_cls  = deepcopy(calc_obs.Cls)
         #print(calc_obs.Cls)
         
     
-        for ind in (1,self.numbins):
+        for ind in (1,self.maxbins):#MMmod: check this when bins are different
             for obs in self.obs:
                 if obs == 'GC':
-                    noisy_cls['G'+str(ind)+'xG'+str(ind)] += 1/ngalbin
+                    noisy_cls['G'+str(ind)+'xG'+str(ind)] += 1/ngalbin_gc
                 if obs == 'WL':
-                    noisy_cls['L'+str(ind)+'xL'+str(ind)] += (eps_error**2)/(2*ngalbin )
+                    noisy_cls['L'+str(ind)+'xL'+str(ind)] += (eps_error**2)/(2*ngalbin_wl)
         return noisy_cls
 
 
@@ -109,7 +110,7 @@ class get_Fisher:
         noisy_cls=self.get_cls_noisy()
         covmat = []
         
-        binrange = range(1, self.numbins+1 )
+        binrange = range(1, self.maxbins+1 )
         
         for ind, ell in enumerate(noisy_cls['ells']):
             covdf = pd.DataFrame(index=self.cols, columns=self.cols).fillna(0.)
@@ -137,10 +138,9 @@ class get_Fisher:
             if 'GC' in self.observables and i<=self.Nbins_gc:
                 ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_gc)*3600*(180/np.pi)**2
                 Nell['G{}xG{}'.format(i,i)] = [(1/ngalbin)]*len(ells)
-        #print(Nell['G{}xG{}'.format(i,i)])
             if 'WL' in self.observables and i<= self.Nbins_wl:
                 ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_wl)*3600*(180/np.pi)**2
-                Nell['L{}xL{}'.format(i,i)] = [(self.galaxy_specs['sigma_eps']**2/ngalbin)]*len(ells)
+                Nell['L{}xL{}'.format(i,i)] = [(self.galaxy_specs['sigma_eps']**2/(2*ngalbin))]*len(ells)
 
         #MMmod: can we account for different fsky in different probes??
         fsky      = self.galaxy_specs['fsky']
@@ -162,21 +162,21 @@ class get_Fisher:
                 Nbins1=self.Nbins_gc
             elif o1==1:
                 Nbins1=self.Nbins_wl
-                for o2,obs2 in enumerate(obs_list):
-                    if o2==0:
-                        Nbins2=self.Nbins_gc
-                    elif o2==1:
-                        Nbins2=self.Nbins_wl
-                    for i in range(Nbins1):
-                        for j in range(Nbins2):
-                            for ell_ind,ell in enumerate(ells):
-                                if obs1 == obs2 and j<i:
-                                    Nell[obs1+str(i+1)+'x'+obs2+str(j+1)] = Nell[obs1+str(j+1)+'x'+obs2+str(i+1)]
-                                    self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)] = self.fidobs[obs1+str(j+1)+'x'+obs2+str(i+1)]
+            for o2,obs2 in enumerate(obs_list):
+                if o2==0:
+                    Nbins2=self.Nbins_gc
+                elif o2==1:
+                    Nbins2=self.Nbins_wl
+                for i in range(Nbins1):
+                    for j in range(Nbins2):
+                        for ell_ind,ell in enumerate(ells):
+                            if obs1 == obs2 and j<i:
+                                Nell[obs1+str(i+1)+'x'+obs2+str(j+1)] = Nell[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                                self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)] = self.fidobs[obs1+str(j+1)+'x'+obs2+str(i+1)]
                         #print(obs1+str(i+1)+'x'+obs2+str(j+1))
 
-                                err_for_cov[o1,o2,ell_ind,i,j] = Nell[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
-                                cls_for_cov[o1,o2,ell_ind,i,j] = self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+                            err_for_cov[o1,o2,ell_ind,i,j] = Nell[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+                            cls_for_cov[o1,o2,ell_ind,i,j] = self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
 
 
         covmat = covariance_einsum(cls_for_cov,err_for_cov,fsky,ells,Delta_ell,return_only_diagonal_ells=True)
@@ -234,8 +234,73 @@ class get_Fisher:
                         
                             Fisher[i_ell, ind1, ind2] = (trace*(self.ells[i_ell]+0.5)*self.deltas[i_ell])
             Fisher_final = np.sum(Fisher, axis=0)
+
         elif self.covmat_type == 1:
-            sys.exit('Not ready yet!')
+
+            #MMmod: assumes only GC/WL
+
+            WLcols  = ['L{}xL{}'.format(i,j) for i in range(1,self.Nbins_wl+1) for j in range(i,self.Nbins_wl+1)]
+            GCcols  = ['G{}xG{}'.format(i,j) for i in range(1,self.Nbins_gc+1) for j in range(i,self.Nbins_gc+1)]
+            GGLcols = ['G{}xL{}'.format(i,j) for i in range(1,self.Nbins_gc+1) for j in range(1,self.Nbins_wl+1)]
+
+            all_cols = []
+            if 'WL' in self.observables: 
+               all_cols = all_cols+WLcols
+            if 'GC' in self.observables:
+                if 'WL' in self.observables:
+                    all_cols = all_cols+GGLcols+GCcols
+                else:
+                    all_cols = all_cols+GCcols
+
+
+            def str_to_ind(in_obs):
+
+                if 'GC' in self.observables and 'WL' in self.observables:
+                    if in_obs == 'G':
+                        ind = 0
+                    elif in_obs == 'L':
+                        ind = 1
+                else:
+                    ind = 0
+
+                return ind
+
+            def split_num(s):
+                head = s.rstrip('0123456789')
+                tail = s[len(head):]
+                return head, tail
+
+            for ellind,ell in enumerate(self.fidobs['ells']):
+    
+                packed_covmat = pd.DataFrame(columns=all_cols,index=all_cols,dtype='float')
+    
+                for ind1,col in enumerate(all_cols):
+                    bin1,bin2 = re.split('x',col)
+                    oi1,i1 = split_num(bin1)
+                    oj1,j1 = split_num(bin2)
+    
+                    for ind2,row in enumerate(all_cols):
+                        bin1,bin2 = re.split('x',row)
+                        oi2,i2 = split_num(bin1)
+                        oj2,j2 = split_num(bin2)
+            
+                        packed_covmat.at[row,col] = covmat[str_to_ind(oi1),str_to_ind(oj1),str_to_ind(oi2),str_to_ind(oj2),
+                                                           ellind,int(i1)-1,int(j1)-1,int(i2)-1,int(j2)-1]
+            
+                #packed_covmat.index = packed_covmat.columns
+
+                invcov = np.linalg.inv(packed_covmat)
+
+                for i1,par1 in enumerate(self.free_params):
+                    for i2,par2 in enumerate(self.free_params):
+
+                        der1 = np.array([derivs[par1][col][ellind] for col in all_cols])
+                        der2 = np.array([derivs[par2][col][ellind] for col in all_cols])
+
+                        Fisher[ellind,i1,i2] = np.dot(der1,np.dot(invcov,np.transpose(der2)))
+
+            Fisher_final = np.sum(Fisher, axis=0)
+
         
         return Fisher_final
 
