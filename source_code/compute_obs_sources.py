@@ -101,6 +101,7 @@ class get_obs:
              pars = camb.set_params(**cosmo_pars)
             
         pars.NonLinear = model.NonLinear_both
+        pars.set_matter_power(redshifts=self.z_camb, kmax=2.0)
         results = camb.get_results(pars)
         Omega0_cdm=results.get_Omega('cdm', z=0)
         Omega0_b=results.get_Omega('baryon', z=0)
@@ -111,14 +112,16 @@ class get_obs:
         cosmo_dict['H_Mpc'] = interp1d(self.z_camb, results.h_of_z(self.z_camb))
 
         cosmo_dict['Pk_linear'] = camb.get_matter_power_interpolator(pars, nonlinear=False, 
-    hubble_units=False, k_hunit=False, kmax=10, var1='delta_tot',var2='delta_tot', zmax=self.z_camb[-1])
+    hubble_units=False, k_hunit=False, kmax=50, var1='delta_tot',var2='delta_tot', zmax=self.z_camb[-1])
    
 
 
         cosmo_dict['Pk_delta']= camb.get_matter_power_interpolator(pars, nonlinear=True, 
-    hubble_units=False, k_hunit=False, kmax=10, var1='delta_tot',var2='delta_tot', zmax=self.z_camb[-1])
+    hubble_units=False, k_hunit=False, kmax=50, var1='delta_tot',var2='delta_tot', zmax=self.z_camb[-1])
+        
         cosmo_dict['Pk_Weyl']=camb.get_matter_power_interpolator(pars, nonlinear=False, 
-    hubble_units=False, k_hunit=False, kmax=10, var1='Weyl',var2='Weyl', zmax=self.z_camb[-1])
+    hubble_units=False, k_hunit=False, kmax=50, var1='Weyl',var2='Weyl', zmax=self.z_camb[-1])
+    
     
 
 
@@ -452,7 +455,7 @@ class get_obs:
     
     def gal_window(self,cosmo,i):
         bias_binned = cosmo['bias'](self.observables['GC']['zmean'])
-        Wgal = np.array([self.ni_GC[i](z)*cosmo['H_Mpc'](z) for z in cosmo['z']])
+        Wgal = np.array([self.ni_GC[i](z)*bias_binned[i]*cosmo['H_Mpc'](z) for z in cosmo['z']])
         return Wgal
 
     def lens_window(self,cosmo,i):
@@ -460,7 +463,8 @@ class get_obs:
         return Wlens
 
     def IA_window(self,cosmo,i):
-        WIA = np.array([self.ni_WL[i](z)*cosmo['H_Mpc'](z) for z in cosmo['z']])
+        IA_binned = cosmo['IA_term'](self.observables['WL']['zmean'])
+        WIA = np.array([self.ni_WL[i](z)*IA_binned[i]*cosmo['H_Mpc'](z) for z in cosmo['z']])
         return WIA
 
     def gw_window(self,cosmo,i):
@@ -503,15 +507,14 @@ class get_obs:
                          'Pgwgw': (cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa),
                          'Pdgw': (cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa),
                          'Pgwd': (cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa),
-                         'Pdi': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['IA_term'](z)*cosmo['Pk_delta'].P(z,kappa),
-                         'Pid': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['IA_term'](z)*cosmo['Pk_delta'].P(z,kappa),
-                         'Pgwi': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['IA_term'](z)*cosmo['Pk_delta'].P(z,kappa),
-                         'Pigw': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['IA_term'](z)*cosmo['Pk_delta'].P(z,kappa),
-                         'Pdg': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['bias'](z)*cosmo['Pk_delta'].P(z,kappa),
-                         'Pgd': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['bias'](z)*cosmo['Pk_delta'].P(z,kappa),
-                         'Pggw': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['bias'](z)*cosmo['Pk_delta'].P(z,kappa),
-                         'Pgwg': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['bias'](z)*cosmo['Pk_delta'].P(z,kappa)})
-           
+                         'Pdi': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa),
+                         'Pid': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa),
+                         'Pgwi': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa),
+                         'Pigw': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa),
+                         'Pdg': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa),
+                         'Pgd': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa),
+                         'Pggw': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa),
+                         'Pgwg': np.sqrt(cosmo['Pk_Weyl'].P(z,kappa)/cosmo['Pk_linear'].P(z,kappa))*cosmo['Pk_delta'].P(z,kappa)})
 
         return Pell
 
