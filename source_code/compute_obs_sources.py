@@ -29,6 +29,9 @@ class get_obs:
         self.ells=ells
         self.zinterps = np.logspace(-3,np.log10(5),500)
         self.k_max_Boltzmann = 10
+
+        #MMmod: switch here if we want to customize
+        self.params['dark_energy_model'] = 'ppf'
         
         for obs in self.observables.keys():
             if obs not in possible_observables:
@@ -80,7 +83,9 @@ class get_obs:
         from   camb         import model, initialpower
         self.z            = np.linspace(0.001,4,500)
         cosmo_pars = cosmo['cosmo_params']
-        print(camb.__path__)
+        
+        #MMmod: removed print below to avoid cluttering
+        #print(camb.__path__)
         if 'eft_params' in cosmo:
             eft_params=cosmo['eft_params']
             #print(eft_params)

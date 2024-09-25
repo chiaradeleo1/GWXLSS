@@ -1,4 +1,4 @@
-output: chains/LCDM_fisher_second
+output: chains/LCDM_fisher_fourth
 
 obs_settings:
   extra:
@@ -17,7 +17,7 @@ analysis_settings:
 
 sampler:
   Fisher:
-    covmat: 0 #0=second order covmat, 1=fourth order covmat
+    covmat: 1 #0=second order covmat, 1=fourth order covmat
     freepars:
       ombh2:
         fiducial: 0.022445
@@ -26,7 +26,7 @@ sampler:
       omch2:
         fiducial: 0.1205579307
         variation: 0.1
-        latex: \Omega_{\rm c}\,h^2
+        latex: \Omega_{\rm b}\,h^2
       H0:
         fiducial: 67.
         variation: 0.1
