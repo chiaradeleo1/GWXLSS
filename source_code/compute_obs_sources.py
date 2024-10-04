@@ -6,7 +6,7 @@ import pandas as pd
 from scipy.interpolate import interp1d
 from scipy.integrate   import trapz
 
-
+from copy      import deepcopy
 from itertools import product
 from time      import time
 
@@ -19,7 +19,10 @@ class get_obs:
         #Reading used observables from source distribution
         #Checking that there is no weird stuff
         self.observables = observables
-        self.params=params
+        self.params = deepcopy(params)
+        if 'logA' in self.params:
+            self.params['As'] = np.exp(self.params.pop('logA'))*1.e-10
+        
         self.extra_params=extra
         self.case=case
         self.camb_path=camb_path
@@ -27,6 +30,9 @@ class get_obs:
         self.source=source
         self.zinterps = np.logspace(-3,np.log10(5),500)
         self.k_max_Boltzmann = 10
+
+        #MMmod: switch here if we want to customize
+        self.params['dark_energy_model'] = 'ppf'
         
         for obs in self.observables.keys():
             if obs not in possible_observables:
@@ -143,7 +149,9 @@ class get_obs:
         self.z            = np.linspace(0.001,4,500)
         
         cosmo_pars = cosmo['cosmo_params']
-        #print(cosmo_pars)
+        
+        #MMmod: removed print below to avoid cluttering
+        #print(camb.__path__)
         if 'eft_params' in cosmo:
             eft_params=cosmo['eft_params']
             #print(eft_params)

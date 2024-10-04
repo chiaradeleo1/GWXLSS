@@ -21,21 +21,17 @@ class get_Fisher:
         self. param_values = [self.obs_settings['extra'][name] if name in self.obs_settings['extra'] else self.fiducial[name] for name in self.param_names]
         self.param_deltas = [free_params[name] for name in self.param_names]
         self.obs=[]
-        self.numbins=0
+        
         if 'GC' in self.observables:
             self.Nbins_gc=self.observables['GC']['Nbins']
             self.obs.append('G')
-            self.numbins=max(self.Nbins_gc, self.numbins)
+            
         if 'WL' in self.observables:
             self.Nbins_wl=self.observables['WL']['Nbins']
             self.obs.append('L')
-            self.numbins=max(self.Nbins_wl, self.numbins)
-        if 'GW' in self.observables:
-            self.Nbins_gw=self.observables['GW']['Nbins']
-            self.obs.append('W')
-            self.numbins=max(self.numbins,  self.Nbins_gw)
+            
+        self.numbins=max(self.Nbins_gc, self.Nbins_wl)
         self.cols = [f'{o}{ind+1}' for o in self.obs for ind in range(self.numbins)]
-       
 
 
     def numerical_derivative(self):
@@ -45,23 +41,32 @@ class get_Fisher:
             for param in self.param_names }
         
         for i, (param, delta) in enumerate(zip(self.param_names, self.param_deltas)):
+            print('Computing derivative for {}'.format(param))
             fiducial_plus = copy.deepcopy(self.fiducial)
             fiducial_minus = copy.deepcopy(self.fiducial)
+
+            
             extra_plus = copy.deepcopy(self.obs_settings['extra'])
             extra_minus = copy.deepcopy(self.obs_settings['extra'])
 
             if param in self.obs_settings['extra']:
-                epsilon = self.obs_settings['extra'][param] * delta
+                if self.obs_settings['extra'][param] == 0:
+                    epsilon = delta
+            else:
+                epsilon = abs(self.obs_settings['extra'][param])*delta
                 extra_plus[param] += epsilon
                 extra_minus[param] -= epsilon
 
             if param in self.fiducial:
-                epsilon = self.fiducial[param] * delta
+                if self.fiducial[param] == 0:
+                    epsilon = delta
+            else:
+                epsilon = abs(self.fiducial[param])*delta
                 fiducial_plus[param] += epsilon
                 fiducial_minus[param] -= epsilon
             #print(param,fiducial_plus, fiducial_minus,extra_plus , extra_minus)                
-            Cls_plus = get_obs(fiducial_plus, extra_plus, self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'],self.obs_settings['source'], feedback=False).Cls
-            Cls_minus = get_obs(fiducial_minus, extra_minus, self.observables, self.ells, self.obs_settings['camb_path'],self.obs_settings['case'],self.obs_settings['source'], feedback=False).Cls
+            Cls_plus = get_obs(fiducial_plus, extra_plus, self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], feedback=False).Cls
+            Cls_minus = get_obs(fiducial_minus, extra_minus, self.observables, self.ells, self.obs_settings['camb_path'],self.obs_settings['case'], feedback=False).Cls
             
             for ia, aa in enumerate(self.cols):
                 for ib, bb in enumerate(self.cols):
@@ -93,8 +98,9 @@ class get_Fisher:
                 'sigma_eps_gw': 0.005}
             ngwbin = GW_specs['N_gw']/self.Nbins_gw ######SISTEMA
             
+        
         ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.numbins)*3600*(180/np.pi)**2
-        calc_obs= get_obs(self.fiducial,self.obs_settings['extra'], self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], self.obs_settings['source'],feedback=False)
+        calc_obs= get_obs(self.fiducial,self.obs_settings['extra'], self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], feedback=False)
         eps_error = self.galaxy_specs['sigma_eps']
         noisy_cls =  copy.deepcopy(calc_obs.Cls)
         #print(calc_obs.Cls)
@@ -102,14 +108,10 @@ class get_Fisher:
     
         for ind in (1,self.numbins):
             for obs in self.obs:
-                print(self.obs)
-                if obs == 'G':
+                if obs == 'GC':
                     noisy_cls['G'+str(ind)+'xG'+str(ind)] += 1/ngalbin
-                if obs == 'L':
+                if obs == 'WL':
                     noisy_cls['L'+str(ind)+'xL'+str(ind)] += (eps_error**2)/(2*ngalbin )
-                if obs == 'W':
-                    noisy_cls['W'+str(ind)+'xW'+str(ind)] += [(GW_specs['sigma_eps_gw']**2/ngwbin)]
-                    print('Hello')
         return noisy_cls
 
 
@@ -120,7 +122,7 @@ class get_Fisher:
 
 
     def compute_covmat(self):
-        
+        print('Computing covmat')
         noisy_cls=self.get_cls_noisy()
         covmat = []
         

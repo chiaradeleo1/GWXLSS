@@ -1,4 +1,9 @@
-.ipynb_checkpoints/mock_maker-checkpoint.ipynb
 .ipynb_checkpoints/Compute_Fisher-checkpoint.ipynb
+.ipynb_checkpoints/mock_maker-checkpoint.ipynb
+chains/.ipynb_checkpoints/3x2pt_LCDM_MH.updated-checkpoint.yaml
+source_code/.ipynb_checkpoints/fisher-checkpoint.py
+chains/.ipynb_checkpoints/3x2pt_LCDM_MH.updated-checkpoint.yaml
+source_code/.ipynb_checkpoints/plot-checkpoint.py
 *.pdf
 chains/
+*checkpoint*
