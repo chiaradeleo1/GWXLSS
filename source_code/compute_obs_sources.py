@@ -188,8 +188,15 @@ class get_obs:
             use_obs.append('WL')
 
         if 'GW' in self.observables:
-            sys.exit('GW not implemented yet!')
-            use_obs.append('GW')
+            Nbins_GW  = self.observables['GW']['Nbins']
+            n_dict_gw    = {i+1: self.observables['GW']['dist'][i](self.z) for i in range(0, Nbins_GW)}
+        
+            window_list = window_list+[SplinedSourceWindow(source_type='lensing', bias=1, z=self.z, W=n_dict_gw[i]) 
+                                       for i in range(1, Nbins_GW+1)]
+
+            use_obs.append('WL')
+
+        
 
         pars.SourceWindows = window_list
 
@@ -304,6 +311,7 @@ class get_obs:
             GCcols = ['G{}xG{}'.format(i,j) for i in range(1,Nbins_GC+1) for j in range(i,Nbins_GC+1)]
             use_obs.append('GC')
             Nbin['GC']=Nbins_GC+1
+
         if 'WL' in self.observables:
             Nbins_WL  = self.observables['WL']['Nbins']
             WLcols = ['L{}xL{}'.format(i,j) for i in range(1,Nbins_WL+1) for j in range(i,Nbins_WL+1)]
@@ -317,22 +325,40 @@ class get_obs:
                 Nbins_GC=0
                 Nbin['WL']=Nbins_WL+1
                 Nbin['IA']=(2*Nbins_WL)+1
-        if 'WL' in self.observables and 'GC' in self.observables:
-            GGLcols = ['G{}xL{}'.format(i,j) for i in range(1,self.observables['GC']['Nbins']+1) for j in range(1,self.observables['WL']['Nbins']+1)]
-
+##CDL to be improved to account for GCxGW only or WLxGW only
         if 'GW' in self.observables:
-            sys.exit('GW not implemented yet!')
+            Nbins_GW  = self.observables['GW']['Nbins']
+            GWcols = ['W{}xW{}'.format(i,j) for i in range(1,Nbins_GW+1) for j in range(i,Nbins_GW+1)]
             use_obs.append('GW')
+            if 'GC' in self.observables and 'WL' in self.observables:
+                Nbin['GW']=Nbins_GC+(2*Nbins_WL)+Nbins_GW+1
+            else:
+                Nbin['GW']=Nbins_GW+1
 
         
-        if 'WL' in use_obs:
-            if 'GC' in use_obs:
-                all_cols = WLcols+GGLcols+GCcols
-            else:
-                all_cols = WLcols
+        if 'WL' in self.observables and 'GC' in self.observables:
+            GGLcols = ['G{}xL{}'.format(i,j) for i in range(1,self.observables['GC']['Nbins']+1) for j in range(1,self.observables['WL']['Nbins']+1)]
+        if 'WL' in self.observables and 'GW' in self.observables:
+            LGWcols = ['L{}xW{}'.format(i,j) for i in range(1,self.observables['WL']['Nbins']+1) for j in range(1,self.observables['GW']['Nbins']+1)]
+        if 'GC' in  self.observables and 'GW' in  self.observables:
+            GGWcols = ['G{}xW{}'.format(i,j) for i in range(1,self.observables['GC']['Nbins']+1) for j in range(1,self.observables['GW']['Nbins']+1)]
+            
 
-        if 'GC' in use_obs and 'WL' not in use_obs:
-            all_cols = GCcols
+        all_cols=[]
+        if 'WL' in use_obs: 
+               all_cols = all_cols+WLcols
+        if 'GC' in use_obs:
+            if 'WL' in use_obs:
+                all_cols = all_cols+GGLcols+GCcols
+            else:
+                all_cols = all_cols+GCcols
+        if 'GW' in use_obs:
+            all_cols = all_cols+GWcols
+            if 'GC' in use_obs:
+                all_cols = all_cols+GGWcols
+            if 'WL' in use_obs:
+                all_cols = all_cols+LGWcols
+        
 
         #######################################
 
@@ -373,7 +399,6 @@ class get_obs:
             for key,val in IA_interp_dict.items():
                 final_Cls[key]+=val
 
-            
             #Cls gamma x IA
             gamma_IA_interp_dict = {'L{}xL{}'.format(bin1-Nbins_GC, bin2-(Nbins_GC+Nbins_WL)): interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), cls['W{}xW{}'.format(bin1, bin2)], kind='linear')(ells)
                                 for bin1 in range (Nbin['GC'],Nbin['WL']) for bin2 in range(bin1+Nbins_WL,Nbin['IA'])}
@@ -382,7 +407,15 @@ class get_obs:
                 final_Cls[key]+=val
 
             
-        
+        if 'GW' in use_obs:
+            #Cls GW x GW
+
+            gw_interp_dict = {'W{}xW{}'.format(bin1-(Nbins_GC+Nbins_WL+Nbins_WL),bin2-(Nbins_GC+Nbins_WL+Nbins_WL)): interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), cls['W{}xW{}'.format(bin1, bin2)], kind='linear')(ells)
+                              for bin1 in range(Nbin['IA'],Nbin['GW']) for bin2 in range(bin1,Nbin['GW'])}
+            
+            for key,val in gw_interp_dict.items():
+                final_Cls[key] = val
+
         if 'WL' in use_obs and 'GC' in use_obs:
             #Cls gamma x GC
             gc_gamma_interp_dict = {}
@@ -414,7 +447,54 @@ class get_obs:
 
             for key,val in IA_gc_interp_dict.items():
                 final_Cls[key]+= val
-                    
+
+        if 'WL' in use_obs and 'GW' in use_obs:
+            #Cls gamma x GW
+            gw_gamma_interp_dict = {}
+            gamma_gw_interp_dict = {}
+            for bin1 in range(Nbin['GC'],Nbin['WL']):
+                for bin2 in range(Nbin['IA'],Nbin['GW']):
+                    gw_gamma_interp_dict['L{}xW{}'.format(bin1-Nbins_GC, bin2-(2*Nbins_WL))] = interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), cls['W{}xW{}'.format(bin1, bin2)], kind='linear')(ells)
+                    gamma_gw_interp_dict['W{}xL{}'.format(bin2-(2*Nbins_WL), bin1-Nbins_GC)] = interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin2, bin1)])), cls['W{}xW{}'.format(bin2, bin1)], kind='linear')(ells)
+
+
+            for key,val in gw_gamma_interp_dict.items():
+                final_Cls[key]= val
+
+            for key,val in gamma_gw_interp_dict.items():
+                final_Cls[key]= val
+
+
+            
+            #Cls Ia x GW
+            gw_IA_interp_dict = {}
+            IA_gw_interp_dict = {}
+            for bin1 in range(Nbin['WL'],Nbin['IA']):
+                for bin2 in range(Nbin['IA'],Nbin['GW']):
+                    gw_IA_interp_dict['G{}xL{}'.format(bin1-(Nbins_GC+Nbins_WL), bin2-(Nbins_GC+(2*Nbins_WL)))] = interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), cls['W{}xW{}'.format(bin1, bin2)], kind='linear')(ells)
+                    IA_gw_interp_dict['L{}xG{}'.format(bin2-(Nbins_GC+(2*Nbins_WL)), bin1-(Nbins_GC+Nbins_WL))] = interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin2, bin1)])), cls['W{}xW{}'.format(bin2, bin1)], kind='linear')(ells)
+
+            for key,val in gw_IA_interp_dict.items():
+                final_Cls[key]+= val
+
+            for key,val in IA_gw_interp_dict.items():
+                final_Cls[key]+= val
+
+        if 'GW' in use_obs and 'GC' in use_obs:
+            #Cls GW x GC
+            gc_gw_interp_dict = {}
+            gw_gc_interp_dict = {}
+            for bin1 in range(1,Nbin['GC']):
+                for bin2 in range(Nbin['IA'],Nbin['GW']):
+                    gc_gw_interp_dict['G{}xL{}'.format(bin1, bin2-(Nbins_GC+(2*Nbins_WL)))] = interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), cls['W{}xW{}'.format(bin1, bin2)], kind='linear')(ells)
+                    gw_gc_interp_dict['L{}xG{}'.format(bin2-(Nbins_GC+(2*Nbins_WL)), bin1)] = interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin2, bin1)])), cls['W{}xW{}'.format(bin2, bin1)], kind='linear')(ells)
+
+
+            for key,val in gc_gw_interp_dict.items():
+                final_Cls[key]= val
+
+            for key,val in gw_gc_interp_dict.items():
+                final_Cls[key]= val
 
 
         if self.feedback:

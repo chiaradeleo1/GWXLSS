@@ -1,12 +1,13 @@
-output: chains/LCDM_fisher_second
+output: chains/LCDM_GW_fisher_second
 
 obs_settings:
   extra:
   case: simple
   camb_path: /users/chiaradeleo/Desktop/myeftcamb-main
+  source: False
 
 analysis_settings:
-  dist_path: ./mock_data/LCDM_test_galonly_source_distribution.npy
+  dist_path: ./mock_data/LCDM_test_gal_GW_source_distribution.npy
   lmin: 10
   lmax: 1500
   Nbin_ell: 20
