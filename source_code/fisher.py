@@ -6,6 +6,7 @@ from source_code.compute_obs_sources import get_obs
 from source_code.covariance_utils    import covariance_einsum
 
 from time      import time
+import copy
 from copy      import deepcopy
 from itertools import product
 
@@ -28,28 +29,30 @@ class get_Fisher:
         self.covmat_type   = covmat_type
         self.obs           = []
 
-        
+        self.maxbins=0
         if 'GC' in self.observables:
             self.Nbins_gc=self.observables['GC']['Nbins']
             self.obs.append('G')
+            self.maxbins=max(self.Nbins_gc, self.maxbins)
             
         if 'WL' in self.observables:
             self.Nbins_wl=self.observables['WL']['Nbins']
             self.obs.append('L')
+            self.maxbins=max(self.Nbins_wl, self.maxbins)
 
         
         if 'GW' in self.observables:
             self.Nbins_gw=self.observables['GW']['Nbins']
             self.obs.append('W')
+            self.maxbins=max(self.Nbins_gw, self.maxbins)
             
-        self.maxbins=max(self.Nbins_gc, self.Nbins_wl, self.Nbins_gw)
         ######################################################
         self.cols = [f'{o}{ind+1}' for o in self.obs for ind in range(self.maxbins)]
 
         print('')
         print('Computing fiducial observables...')
         tini = time()
-        self.fidobs = get_obs(fiducial,self.obs_settings['extra'],self.observables,self.ells,self.obs_settings['camb_path'],self.obs_settings['case'],feedback=False).Cls
+        self.fidobs = get_obs(fiducial,self.obs_settings['extra'],self.observables,self.ells,self.obs_settings['camb_path'],self.obs_settings['case'],self.obs_settings['source'],feedback=False).Cls
         print('...done in {:.2f} s'.format(time()-tini))
 
 
@@ -73,19 +76,19 @@ class get_Fisher:
             if param in self.obs_settings['extra']:
                 if self.obs_settings['extra'][param] == 0:
                     epsilon = delta
-            else:
-                epsilon = abs(self.obs_settings['extra'][param])*delta
-            extra_plus[param] += epsilon
-            extra_minus[param] -= epsilon
+                else:
+                    epsilon = abs(self.obs_settings['extra'][param])*delta
+                extra_plus[param] += epsilon
+                extra_minus[param] -= epsilon
 
-
-            if self.fiducial[param] == 0:
-                epsilon = delta
-            else:
-                epsilon = abs(self.fiducial[param])*delta
-            
-            fiducial_plus[param]  += epsilon
-            fiducial_minus[param] -= epsilon
+            if param in self.fiducial:
+                if self.fiducial[param] == 0:
+                    epsilon = delta
+                else:
+                    epsilon = abs(self.fiducial[param])*delta
+                
+                fiducial_plus[param]  += epsilon
+                fiducial_minus[param] -= epsilon
             
             Cls_plus  = get_obs(fiducial_plus, extra_plus, self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], self.obs_settings['source'], feedback=False).Cls
             Cls_minus = get_obs(fiducial_minus, extra_minus, self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'] , self.obs_settings['source'], feedback=False).Cls
@@ -110,11 +113,11 @@ class get_Fisher:
             self.GW_specs = {'fsky': 0.35, 
                 'N_gw': 10**5, 
                 'sigma_eps_gw': 0.005}
-            self.ngwbin = GW_specs['N_gw']/self.Nbins_gw ######SISTEMA
+            self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw ######SISTEMA
 
         ngalbin_gc = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_gc)*3600*(180/np.pi)**2
         ngalbin_wl = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_wl)*3600*(180/np.pi)**2
-        calc_obs   = get_obs(self.fiducial,self.obs_settings['extra'], self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], feedback=False)
+        calc_obs   = get_obs(self.fiducial,self.obs_settings['extra'], self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], self.obs_settings['source'],feedback=False)
         eps_error  = self.galaxy_specs['sigma_eps']
         noisy_cls  = deepcopy(calc_obs.Cls)
         #print(calc_obs.Cls)
@@ -162,7 +165,7 @@ class get_Fisher:
             self.GW_specs = {'fsky': 0.35, 
                 'N_gw': 10**5, 
                 'sigma_eps_gw': 0.005}
-            self.ngwbin = GW_specs['N_gw']/self.Nbins_gw ######SISTEMA
+            self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw ######SISTEMA
 
         ells = self.fidobs['ells'].values
         Nell = {k: [0.]*len(ells) for k in self.fidobs.columns}
@@ -175,21 +178,21 @@ class get_Fisher:
                 ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_wl)*3600*(180/np.pi)**2
                 Nell['L{}xL{}'.format(i,i)] = [(self.galaxy_specs['sigma_eps']**2/(2*ngalbin))]*len(ells)
             if 'GW' in self.observables and i<= self.Nbins_gw:
-                self.ngwbin = GW_specs['N_gw']/self.Nbins_gw 
-                Nell['W'+str(ind)+'xW'+str(ind)] += [(self.GW_specs['sigma_eps_gw']**2/self.ngwbin)]*len(ells)
+                self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw 
+                Nell['W{}xW{}'.format(i,i)] += [(self.GW_specs['sigma_eps_gw']**2/self.ngwbin)]*len(ells)
 
         #MMmod: can we account for different fsky in different probes??
         fsky      = self.galaxy_specs['fsky']
         Delta_ell = self.deltas
-
+        j=0
         obs_list = []
-        if 'GC' in use_obs:
+        if 'GC' in self.observables:
             obs_list.append('G')
             j+=1
-        if 'WL' in use_obs:
+        if 'WL' in self.observables:
             obs_list.append('L')
             j+=1
-        if 'GW' in use_obs:
+        if 'GW' in self.observables:
             obs_list.append('W')
             j+=1
 
@@ -307,11 +310,11 @@ class get_Fisher:
                     all_cols = all_cols+GGLcols+GCcols
                 else:
                     all_cols = all_cols+GCcols
-            if 'GW' in use_obs:
+            if 'GW' in self.observables:
                 all_cols = all_cols+GWcols
-                if 'GC' in use_obs:
+                if 'GC' in self.observables:
                     all_cols = all_cols+GGWcols
-                if 'WL' in use_obs:
+                if 'WL' in self.observables:
                     all_cols = all_cols+LGWcols
 
 
