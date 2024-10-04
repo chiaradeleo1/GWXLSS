@@ -9,3 +9,8 @@ chains/
 *checkpoint*
 *.ipynb
 *.png
+.ipynb_checkpoints/
+analyze_chains.ipynb
+*.txt
+*.covmat
+Compute_Fisher.ipynb
