@@ -8,19 +8,21 @@ from itertools import product
 
 
 class get_Fisher:
-    def __init__(self, fiducial, free_params, ells, deltas, obs, obs_settings, galaxy_specs):
+    def __init__(self, fiducial, free_params, ells, deltas, obs, obs_settings, galaxy_specs,covmat_type):
 
-        self.ells=ells
-        self.observables=obs
-        self.galaxy_specs=galaxy_specs
-        self.fiducial=fiducial
-        self.deltas=deltas
-        self.obs_settings=obs_settings
-        self.free_params = free_params
-        self.param_names = list(free_params.keys())
-        self. param_values = [fiducial[name] for name in self.param_names]
-        self.param_deltas = [free_params[name] for name in self.param_names]
-        self.obs=[]
+        self.ells          = ells
+        self.observables   = obs
+        self.galaxy_specs  = galaxy_specs
+        self.fiducial      = fiducial
+        self.deltas        = deltas
+        self.obs_settings  = obs_settings
+        self.free_params   = free_params
+        self.param_names   = list(free_params.keys())
+        self. param_values = [obs_settings['extra'][name] if name in self.obs_settings['extra'] else fiducial[name] for name in self.param_names]
+        self.param_deltas  = [free_params[name]['variation'] for name in self.param_names]
+        self.covmat_type   = covmat_type
+        self.obs           = []
+
         
         if 'GC' in self.observables:
             self.Nbins_gc=self.observables['GC']['Nbins']
@@ -29,9 +31,22 @@ class get_Fisher:
         if 'WL' in self.observables:
             self.Nbins_wl=self.observables['WL']['Nbins']
             self.obs.append('L')
+
+        
+        if 'GW' in self.observables:
+            self.Nbins_gw=self.observables['GW']['Nbins']
+            self.obs.append('W')
             
-        self.numbins=max(self.Nbins_gc, self.Nbins_wl)
-        self.cols = [f'{o}{ind+1}' for o in self.obs for ind in range(self.numbins)]
+        self.maxbins=max(self.Nbins_gc, self.Nbins_wl, self.Nbins_gw)
+        ######################################################
+        self.cols = [f'{o}{ind+1}' for o in self.obs for ind in range(self.maxbins)]
+
+        print('')
+        print('Computing fiducial observables...')
+        tini = time()
+        self.fidobs = get_obs(fiducial,self.obs_settings['extra'],self.observables,self.ells,self.obs_settings['camb_path'],self.obs_settings['case'],feedback=False).Cls
+        print('...done in {:.2f} s'.format(time()-tini))
+
 
 
     def numerical_derivative(self):
@@ -43,6 +58,8 @@ class get_Fisher:
         for i, (param, delta) in enumerate(zip(self.param_names, self.param_deltas)):
             fiducial_plus = copy.deepcopy(self.fiducial)
             fiducial_minus = copy.deepcopy(self.fiducial)
+            extra_plus = copy.deepcopy(self.obs_settings['extra'])
+            extra_minus = copy.deepcopy(self.obs_settings['extra'])
             
             epsilon = self.fiducial[param] * delta
             fiducial_plus[param] += epsilon
