@@ -163,7 +163,7 @@ class get_Fisher:
     def compute_covmat_fourth_order(self):
         if 'GW' in self.observables:
             self.GW_specs = {'fsky': 0.35, 
-                'N_gw': 10**5, 
+                'N_gw': 10**4, 
                 'sigma_eps_gw': 0.005}
             self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw ######SISTEMA
 
