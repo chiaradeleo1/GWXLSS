@@ -14,11 +14,12 @@ from itertools import product
 
 class get_Fisher:
 
-    def __init__(self,fiducial,free_params,ells,deltas,obs,obs_settings,galaxy_specs,covmat_type):
+    def __init__(self,fiducial,free_params,ells,deltas,obs,obs_settings,galaxy_specs,GW_specs,covmat_type):
 
         self.ells          = ells
         self.observables   = obs
         self.galaxy_specs  = galaxy_specs
+        self.GW_specs      = GW_specs
         self.fiducial      = fiducial
         self.deltas        = deltas
         self.obs_settings  = obs_settings
@@ -28,7 +29,7 @@ class get_Fisher:
         self.param_deltas  = [free_params[name]['variation'] for name in self.param_names]
         self.covmat_type   = covmat_type
         self.obs           = []
-
+        
         self.maxbins=0
         if 'GC' in self.observables:
             self.Nbins_gc=self.observables['GC']['Nbins']
@@ -108,12 +109,8 @@ class get_Fisher:
 
     def get_cls_noisy(self):
 
-        #Hard coded CDL
         if 'GW' in self.observables:
-            self.GW_specs = {'fsky': 0.35, 
-                'N_gw': 10**5, 
-                'sigma_eps_gw': 0.005}
-            self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw ######SISTEMA
+            self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw 
 
         ngalbin_gc = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_gc)*3600*(180/np.pi)**2
         ngalbin_wl = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_wl)*3600*(180/np.pi)**2
@@ -162,11 +159,8 @@ class get_Fisher:
 
     def compute_covmat_fourth_order(self):
         if 'GW' in self.observables:
-            self.GW_specs = {'fsky': 0.35, 
-                'N_gw': 10**4, 
-                'sigma_eps_gw': 0.005}
-            self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw ######SISTEMA
-
+            self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw
+        #print(self.GW_specs.keys())
         ells = self.fidobs['ells'].values
         Nell = {k: [0.]*len(ells) for k in self.fidobs.columns}
 
@@ -244,6 +238,7 @@ class get_Fisher:
         tini = time()
         if self.covmat_type == 0:
             covmat = self.compute_covmat_second_order()
+            
         elif self.covmat_type == 1:
             covmat = self.compute_covmat_fourth_order()
         else:
