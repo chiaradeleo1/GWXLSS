@@ -14,4 +14,4 @@ analyze_chains.ipynb
 *.txt
 *.covmat
 Compute_Fisher.ipynb
-mock_maker/
+mock_data/
