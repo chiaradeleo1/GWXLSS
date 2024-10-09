@@ -189,12 +189,19 @@ class get_obs:
 
         if 'GW' in self.observables:
             Nbins_GW  = self.observables['GW']['Nbins']
+            pars.SourceTerms.gw_density=True
+            pars.SourceTerms.gw_timedelay=False
+            pars.SourceTerms.gw_evolve=False
+            pars.SourceTerms.gw_velocity=False
+            pars.SourceTerms.gw_ISW = False
+            pars.SourceTerms.gw_lsd = False
+            #(pars)
             n_dict_gw    = {i+1: self.observables['GW']['dist'][i](self.z) for i in range(0, Nbins_GW)}
         
-            window_list = window_list+[SplinedSourceWindow(source_type='lensing', bias=1, z=self.z, W=n_dict_gw[i]) 
+            window_list = window_list+[SplinedSourceWindow(source_type='counts', bias=bias_binned[i-1], z=self.z, W=n_dict_gw[i]) 
                                        for i in range(1, Nbins_GW+1)]
 
-            use_obs.append('WL')
+            use_obs.append('GW')
 
         
 
