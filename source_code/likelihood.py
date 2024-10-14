@@ -41,10 +41,12 @@ class LSSlike(Likelihood):
 
     def logp(self, **params_values):
         eft_params = {key: value for key, value in params_values.items() if "EFT" in key }
-        eft_params.update(self.extra)
+        if eft_params:
+            eft_params.update(self.extra)
+
         params = {key: value for key, value in params_values.items() if "EFT" not in key }
         
-        self.obs = get_obs(params,eft_params,self.observables, self.data_ells, self.camb_path, self.case,feedback=self.feedback)
+        self.obs = get_obs(params,self.extra,self.observables, self.data_ells, self.camb_path, self.case, self.source,feedback=self.feedback)
         
         loglike = 0
         for ind,ell in enumerate(self.data_ells):

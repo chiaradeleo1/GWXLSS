@@ -2,6 +2,11 @@ import sys
 import numpy as np
 import pandas as pd
 
+import warnings
+import pandas as pd
+
+# Suppress the specific PerformanceWarning from Pandas
+warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 from scipy.interpolate import interp1d
 from scipy.integrate   import trapz
@@ -63,16 +68,19 @@ class get_obs:
     def get_cosmo_dict(self,params): 
                 
         nuis_keys  = ['_derived','a0','a1', 'a2', 'a3', 'a4', 'b0_poly', 'b1_poly', 'b2_poly', 'b3_poly', 'logA', 'omegam', 'omegab', 'sigma8']
-        nuis_keys = nuis_keys + list(self.extra_params.keys())
+        if self.extra_params:
+            nuis_keys = nuis_keys + list(self.extra_params.keys())
         
         cosmo_params = {par: params[par] for par in params.keys() if par not in nuis_keys}
         cosmo_dict = {'cosmo_params': cosmo_params}
-        if 'EFTflag' in self.extra_params:
-            flag=self.extra_params['EFTflag']
-            if flag !=0:
-                eftparams=self.extra_params
-                cosmo_dict['eft_params'] = eftparams
+        if self.extra_params:
+            if 'EFTflag' in self.extra_params:
+                flag=self.extra_params['EFTflag']
+                if flag !=0:
+                    eftparams=self.extra_params
+                    cosmo_dict['eft_params'] = eftparams
             
+  
 
         IA =[sum([params['a{}'.format(ind)]*np.power(z,ind) for ind in range(5)]) for z in self.zinterps] 
         cosmo_dict['IA_term']= interp1d(self.zinterps,IA)
@@ -195,16 +203,20 @@ class get_obs:
             pars.SourceTerms.gw_velocity=False
             pars.SourceTerms.gw_ISW = False
             pars.SourceTerms.gw_lsd = False
-            #(pars)
+            pars.SourceTerms.gw_gradpotential = False
+            pars.SourceTerms.gw_potential = False
+            pars.SourceTerms.gw_lensing = False
+            
+            #print(pars)
             n_dict_gw    = {i+1: self.observables['GW']['dist'][i](self.z) for i in range(0, Nbins_GW)}
         
-            window_list = window_list+[SplinedSourceWindow(source_type='counts', bias=bias_binned[i-1], z=self.z, W=n_dict_gw[i]) 
+            window_list = window_list+[SplinedSourceWindow(source_type='counts', bias=1, z=self.z, W=n_dict_gw[i]) 
                                        for i in range(1, Nbins_GW+1)]
 
             use_obs.append('GW')
 
         
-
+        print(window_list)
         pars.SourceWindows = window_list
 
         tini = time()
