@@ -216,7 +216,7 @@ class get_obs:
             use_obs.append('GW')
 
         
-        print(window_list)
+        #print(window_list)
         pars.SourceWindows = window_list
 
         tini = time()
