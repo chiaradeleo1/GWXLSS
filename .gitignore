@@ -5,7 +5,6 @@ source_code/.ipynb_checkpoints/fisher-checkpoint.py
 chains/.ipynb_checkpoints/3x2pt_LCDM_MH.updated-checkpoint.yaml
 source_code/.ipynb_checkpoints/plot-checkpoint.py
 *.pdf
-chains/
 *checkpoint*
 *.ipynb
 *.png
@@ -14,5 +13,12 @@ analyze_chains.ipynb
 *.txt
 *.covmat
 Compute_Fisher.ipynb
-mock_data/
 tester.py
+*.ipynb
+*.progress*
+*.txt
+chains/*
+mock_data/*
+*.covmat
+settings/.ipynb_checkpoints/*
+source_code/.ipynb_checkpoints/*
