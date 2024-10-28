@@ -133,7 +133,7 @@ class get_obs:
                                        for i in range(1, Nbins_GW+1)]
 
         pars.SourceWindows = window_list
-
+        
         tini = time()
         
         results = camb.get_results(pars)
