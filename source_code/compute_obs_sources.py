@@ -206,19 +206,27 @@ class get_obs:
             pars.SourceTerms.gw_gradpotential = False
             pars.SourceTerms.gw_potential = False
             pars.SourceTerms.gw_lensing = False
-            
+            pars.SourceTerms.gwlens_volume = False
+            pars.SourceTerms.gwlens_sw = False
+            pars.SourceTerms.gwlens_ISW = False
+            pars.SourceTerms.gwlens_velocity = False
+            pars.SourceTerms.gwlens_TD = False
+
+
             #print(pars)
             n_dict_gw    = {i+1: self.observables['GW']['dist'][i](self.z) for i in range(0, Nbins_GW)}
         
-            window_list = window_list+[SplinedSourceWindow(source_type='counts', bias=1, z=self.z, W=n_dict_gw[i]) 
-                                       for i in range(1, Nbins_GW+1)]
+            #window_list = window_list+[SplinedSourceWindow(source_type='counts', bias=1, z=self.z, W=n_dict_gw[i]) 
+               #                        for i in range(1, Nbins_GW+1)]
+            window_list = window_list+[SplinedSourceWindow(source_type='gws_lens', bias=1, z=self.z, W=n_dict[i]) 
+                                   for i in range(1, Nbins_GW+1)]
 
             use_obs.append('GW')
 
         
         #print(window_list)
         pars.SourceWindows = window_list
-
+        
         tini = time()
         
         results = camb.get_results(pars)
