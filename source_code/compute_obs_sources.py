@@ -73,12 +73,7 @@ class get_obs:
         
         cosmo_params = {par: params[par] for par in params.keys() if par not in nuis_keys}
         cosmo_dict = {'cosmo_params': cosmo_params}
-        if self.extra_params:
-            if 'EFTflag' in self.extra_params:
-                flag=self.extra_params['EFTflag']
-                if flag !=0:
-                    eftparams=self.extra_params
-                    cosmo_dict['eft_params'] = eftparams
+        
             
   
 
@@ -106,13 +101,7 @@ class get_obs:
         cosmo_pars = cosmo_dict['cosmo_params']
         #print(cosmo_pars)
         self.z_camb=np.linspace(0.001,4.,100)
-        if 'eft_params' in cosmo_dict:
-            eft_params=cosmo_dict['eft_params']
-            pars = camb.set_params(**cosmo_pars,**eft_params)
-            
-
-        else:
-             pars = camb.set_params(**cosmo_pars)
+        pars = camb.set_params(**cosmo_pars)
             
         pars.NonLinear = model.NonLinear_both
         pars.set_matter_power(redshifts=self.z_camb, kmax=2.0)
@@ -160,14 +149,7 @@ class get_obs:
         
         #MMmod: removed print below to avoid cluttering
         #print(camb.__path__)
-        if 'eft_params' in cosmo:
-            eft_params=cosmo['eft_params']
-            #print(eft_params)
-            pars = camb.set_params(**cosmo_pars,**eft_params)
-            #print(eft_params)
-
-        else:
-             pars = camb.set_params(**cosmo_pars)
+        pars = camb.set_params(**cosmo_pars)
         pars = self.set_camb_specs(pars,self.case)  #This sets the cases for CAMB (Limber & friends)
         pars.NonLinear = model.NonLinear_both
         use_obs     = []

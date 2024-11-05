@@ -12,7 +12,7 @@ from source_code.compute_obs_sources import get_obs
 
 from time import time
 
-sys.path.insert(0,'/users/chiaradeleo/Desktop/myeftcamb-main')
+sys.path.insert(0,self.camb_path)
 class LSSlike(Likelihood):
 
     def initialize(self):
@@ -40,11 +40,7 @@ class LSSlike(Likelihood):
 
 
     def logp(self, **params_values):
-        eft_params = {key: value for key, value in params_values.items() if "EFT" in key }
-        if eft_params:
-            eft_params.update(self.extra)
-
-        params = {key: value for key, value in params_values.items() if "EFT" not in key }
+        params = {key: value for key, value in params_values.items() }
         
         self.obs = get_obs(params,self.extra,self.observables, self.data_ells, self.camb_path, self.case, self.source,feedback=self.feedback)
         
