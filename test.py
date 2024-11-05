@@ -27,6 +27,11 @@ cosmo_pars = {'ombh2': 0.022445,
             'MG_flag':0}
 
 extra={'MG_flag':0}
+
+settings={'camb_path': camb.__path__,
+         'case': 'simple',
+         'calculation': 'CAMB',
+          'extra':extra}
 analysis_settings = {'Nbin_ell': 20,
                      'lmin': 10,
                      'lmax': 1500}
@@ -38,5 +43,5 @@ ell_lims = np.logspace(lmin,lmax,N) #creation of array-> N bin log spaced
 ells     = np.array([int(ell) for ell in 0.5*(ell_lims[:-1]+ell_lims[1:])]) 
 #evaluation of middle points of each bin 
 deltas   = (ell_lims[1:]-ell_lims[:-1]) #evaluation of the amplitude of each bin
-calc_obs = get_obs(cosmo_pars,extra,observables,ells,camb.__path__,case='simple',source=True,feedback=False)
+calc_obs = get_obs(cosmo_pars,observables,ells,settings,feedback=True)
 #print(calc_obs.Cls)

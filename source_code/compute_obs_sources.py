@@ -19,7 +19,7 @@ possible_observables = ['GC','WL','GW']
 
 class get_obs:
 
-    def __init__(self,params, extra, observables,ells,camb_path,case,calculation,feedback=False):
+    def __init__(self,params, observables,ells, settings, feedback=False):
 
         #Reading used observables from source distribution
         #Checking that there is no weird stuff
@@ -28,11 +28,11 @@ class get_obs:
         if 'logA' in self.params:
             self.params['As'] = np.exp(self.params.pop('logA'))*1.e-10
         
-        self.extra_params=extra
-        self.case=case
-        self.camb_path=camb_path
+        self.extra_params=settings['extra']
+        self.case=settings['case']
+        self.camb_path=settings['camb_path']
         self.ells=ells
-        self.calculation=calculation
+        self.calculation=settings['calculation']
         self.zinterps = np.logspace(-3,np.log10(5),500)
         self.k_max_Boltzmann = 10
 

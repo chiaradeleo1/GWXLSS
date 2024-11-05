@@ -12,7 +12,7 @@ from source_code.compute_obs_sources import get_obs
 
 from time import time
 
-sys.path.insert(0,self.camb_path)
+
 class LSSlike(Likelihood):
 
     def initialize(self):
@@ -42,7 +42,7 @@ class LSSlike(Likelihood):
     def logp(self, **params_values):
         params = {key: value for key, value in params_values.items() }
         
-        self.obs = get_obs(params,self.extra,self.observables, self.data_ells, self.camb_path, self.case, self.calculation,feedback=self.feedback)
+        self.obs = get_obs(params,self.observables, self.data_ells, self.settings,feedback=self.feedback)
         
         loglike = 0
         for ind,ell in enumerate(self.data_ells):
