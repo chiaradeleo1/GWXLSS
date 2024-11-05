@@ -73,14 +73,7 @@ class get_obs:
         
         cosmo_params = {par: params[par] for par in params.keys() if par not in nuis_keys}
         cosmo_dict = {'cosmo_params': cosmo_params}
-        if self.extra_params:
-            if 'EFTflag' in self.extra_params:
-                flag=self.extra_params['EFTflag']
-                if flag !=0:
-                    eftparams=self.extra_params
-                    cosmo_dict['eft_params'] = eftparams
-            
-  
+        
 
         IA =[sum([params['a{}'.format(ind)]*np.power(z,ind) for ind in range(5)]) for z in self.zinterps] 
         cosmo_dict['IA_term']= interp1d(self.zinterps,IA)
@@ -151,8 +144,8 @@ class get_obs:
         sys.path.insert(0,self.camb_path)
          
         import camb
-        from   camb.sources import GaussianSourceWindow, SplinedSourceWindow
-        from   camb         import model, initialpower
+        from   camb.sources import SplinedSourceWindow
+        from   camb         import model
         self.z            = np.linspace(0.001,4,500)
         
         cosmo_pars = cosmo['cosmo_params']
@@ -196,7 +189,7 @@ class get_obs:
             Nbins_GW  = self.observables['GWC']['Nbins']
             n_dict_gw    = {i+1: self.observables['GWC']['dist'][i](self.z) for i in range(0, Nbins_GW)}
         
-            window_list = window_list+[SplinedSourceWindow(source_type='gws_lens', bias=1, z=self.z, W=n_dict_gw[i]) 
+            window_list = window_list+[SplinedSourceWindow(source_type='gws', bias=1, z=self.z, W=n_dict_gw[i]) 
                                        for i in range(1, Nbins_GW+1)]
 
             use_obs.append('GWC')
@@ -232,7 +225,6 @@ class get_obs:
 
 
     def set_camb_specs(self,pars,case):#='simple'):
-        pars.Want_CMB = False
         pars.Want_CMB = False
         pars.SourceTerms.limber_windows = True
         pars.SourceTerms.limber_phi_lmin = 2
@@ -348,10 +340,10 @@ class get_obs:
             WLcols = ['L{}xL{}'.format(i,j) for i in range(1,self.observables['WL']['Nbins']+1) for j in range(i,self.observables['WL']['Nbins']+1)]
             use_obs.append('WL')
             Nbin['WL']=Nbin['GC']+self.observables['WL']['Nbins'] #10+10 = 20
-            Nbin['IA']= Nbin['GC']+(2*self.observables['WL']['Nbins']) #10+2*20 = 30
+            Nbin['IA']= Nbin['WL']+self.observables['WL']['Nbins'] #10+2*20 = 30
         else :
             Nbin['WL']=Nbin['GC']
-            Nbin['IA']=Nbin['GC']
+            Nbin['IA']=Nbin['WL']
 
 
         if 'GWC' in self.observables:
@@ -435,9 +427,10 @@ class get_obs:
             gamma_interp_dict = {'L{}xL{}'.format(bin1-Nbin['GC'], bin2-Nbin['GC']): interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), cls['W{}xW{}'.format(bin1, bin2)], kind='linear')(ells)
                                 for bin1 in range(Nbin['GC']+1,Nbin['WL']+1) for bin2 in range(bin1,Nbin['WL']+1)}
             
-                    
+             
             for key,val in gamma_interp_dict.items():
                 final_Cls[key]=val
+
                 
                 
                 
@@ -448,10 +441,11 @@ class get_obs:
 
             for key,val in IA_interp_dict.items():
                 final_Cls[key]+=val
+                
 
             #Cls gamma x IA
             gamma_IA_interp_dict = {'L{}xL{}'.format(bin1-Nbin['GC'], bin2-(Nbin['WL'])): interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), cls['W{}xW{}'.format(bin1, bin2)], kind='linear')(ells)
-                                for bin1 in range (Nbin['GC']+1,Nbin['WL']+1) for bin2 in range(bin1+Nbin['WL'],Nbin['IA']+1)}
+                                for bin1 in range (Nbin['GC']+1,Nbin['WL']+1) for bin2 in range(bin1+Nbin['GC'],Nbin['IA']+1)}
 
             for key,val in gamma_IA_interp_dict.items():
                 final_Cls[key]+=val
@@ -526,7 +520,7 @@ class get_obs:
 
 
             
-            #Cls Ia x GW
+            #Cls Ia x GWC
             gwc_IA_interp_dict = {}
             IA_gwc_interp_dict = {}
             for bin1 in range(Nbin['WL']+1,Nbin['IA']+1):
@@ -594,11 +588,11 @@ class get_obs:
 
 
             
-            #Cls Ia x GW
+            #Cls Ia x GWWL
             gwl_IA_interp_dict = {}
             IA_gwl_interp_dict = {}
             for bin1 in range(Nbin['WL']+1,Nbin['IA']+1):
-                for bin2 in range(Nbin['IA']+1,Nbin['GWL']+1):
+                for bin2 in range(Nbin['GWC']+1,Nbin['GWL']+1):
                     gwl_IA_interp_dict['L{}xWL{}'.format(bin1-Nbin['WL'], bin2-Nbin['GWC'])] = interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), cls['W{}xW{}'.format(bin1, bin2)], kind='linear')(ells)
                     IA_gwl_interp_dict['WL{}xL{}'.format(bin2-Nbin['GWC'], bin1-Nbin['WL'])] = interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin2, bin1)])), cls['W{}xW{}'.format(bin2, bin1)], kind='linear')(ells)
 
