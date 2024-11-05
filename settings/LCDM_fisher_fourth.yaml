@@ -3,10 +3,11 @@ output: chains/LCDM_fisher_fourth
 obs_settings:
   extra:
   case: simple
-  camb_path: /users/chiaradeleo/Desktop/myeftcamb-main
+  camb_path: 
+  calculation: CAMB
 
 analysis_settings:
-  dist_path: ./mock_data/LCDM_test_galonly_source_distribution.npy
+  dist_path: ./mock_data/LCDM_test_gal_source_distribution.npy
   lmin: 10
   lmax: 1500
   Nbin_ell: 20
