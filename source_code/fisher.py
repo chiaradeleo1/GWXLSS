@@ -42,10 +42,15 @@ class get_Fisher:
             self.maxbins=max(self.Nbins_wl, self.maxbins)
 
         
-        if 'GW' in self.observables:
-            self.Nbins_gw=self.observables['GW']['Nbins']
-            self.obs.append('W')
-            self.maxbins=max(self.Nbins_gw, self.maxbins)
+        if 'GWWL' in self.observables:
+            self.Nbins_gwl=self.observables['GWWL']['Nbins']
+            self.obs.append('WL')
+            self.maxbins=max(self.Nbins_gwl, self.maxbins)
+        
+        if 'GWC' in self.observables:
+            self.Nbins_gwc=self.observables['GWC']['Nbins']
+            self.obs.append('WC')
+            self.maxbins=max(self.Nbins_gwc, self.maxbins)
             
         ######################################################
         self.cols = [f'{o}{ind+1}' for o in self.obs for ind in range(self.maxbins)]
@@ -60,8 +65,7 @@ class get_Fisher:
 
     def numerical_derivative(self):
         #MMmod: more reliable method to be added here!!! E.g. STEM
-        n_params = len(self.param_names)
-        n_ells   = len(self.ells)
+        
         derivs   = {param: {f"{ind1}x{ind2}": np.zeros(len(self.ells)) for ind1 in self.cols for ind2 in self.cols}
                     for param in self.param_names }
         
@@ -69,12 +73,8 @@ class get_Fisher:
             print('...computing derivative for {}...'.format(param))
             fiducial_plus = copy.deepcopy(self.fiducial)
             fiducial_minus = copy.deepcopy(self.fiducial)
-            extra = copy.deepcopy(self.obs_settings['extra'])
             
-            #MM: added to avoid 0 value epsilons if fiducial is 0
-
             
-
             if param in self.fiducial:
                 if self.fiducial[param] == 0:
                     epsilon = delta
@@ -102,15 +102,20 @@ class get_Fisher:
 
     def get_cls_noisy(self):
 
-        if 'GW' in self.observables:
-            self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw 
+        if 'GWWL' in self.observables:
+            self.ngwlbin = self.GW_specs['N_gw']/self.Nbins_gwl 
+        if 'GWC' in self.observables:
+            self.ngwcbin = self.GW_specs['N_gw']/self.Nbins_gwc 
+        if 'GC' in self.observables:
+            ngalbin_gc = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_gc)*3600*(180/np.pi)**2
+        if 'WL' in self.observables:
+            ngalbin_wl = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_wl)*3600*(180/np.pi)**2
+            eps_error  = self.galaxy_specs['sigma_eps']
 
-        ngalbin_gc = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_gc)*3600*(180/np.pi)**2
-        ngalbin_wl = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_wl)*3600*(180/np.pi)**2
+        
         calc_obs   = get_obs(self.fiducial, self.observables, self.ells, self.obs_settings,feedback=False)
-        eps_error  = self.galaxy_specs['sigma_eps']
         noisy_cls  = deepcopy(calc_obs.Cls)
-        #print(calc_obs.Cls)
+       
         
     
         for ind in (1,self.maxbins):#MMmod: check this when bins are different
@@ -119,8 +124,10 @@ class get_Fisher:
                     noisy_cls['G'+str(ind)+'xG'+str(ind)] += 1/ngalbin_gc
                 if obs == 'L':
                     noisy_cls['L'+str(ind)+'xL'+str(ind)] += (eps_error**2)/(2*ngalbin_wl)
-                if obs == 'W':
-                    noisy_cls['W'+str(ind)+'xW'+str(ind)] += [(self.GW_specs['sigma_eps_gw']**2/self.ngwbin)]
+                if obs == 'WL':
+                    noisy_cls['WL'+str(ind)+'xWL'+str(ind)] += [(self.GW_specs['sigma_eps_gw']**2/self.ngwlbin)]
+                if obs == 'WC':
+                    noisy_cls['WC'+str(ind)+'xWC'+str(ind)] += [(self.GW_specs['sigma_eps_gw']**2/self.ngwcbin)] #Is it the same for GWWL and GWCounts?
         return noisy_cls
 
 
@@ -151,9 +158,7 @@ class get_Fisher:
 
 
     def compute_covmat_fourth_order(self):
-        if 'GW' in self.observables:
-            self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw
-        #print(self.GW_specs.keys())
+        
         ells = self.fidobs['ells'].values
         Nell = {k: [0.]*len(ells) for k in self.fidobs.columns}
 
@@ -164,9 +169,12 @@ class get_Fisher:
             if 'WL' in self.observables and i<= self.Nbins_wl:
                 ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_wl)*3600*(180/np.pi)**2
                 Nell['L{}xL{}'.format(i,i)] = [(self.galaxy_specs['sigma_eps']**2/(2*ngalbin))]*len(ells)
-            if 'GW' in self.observables and i<= self.Nbins_gw:
-                self.ngwbin = self.GW_specs['N_gw']/self.Nbins_gw 
-                Nell['W{}xW{}'.format(i,i)] += [(self.GW_specs['sigma_eps_gw']**2/self.ngwbin)]*len(ells)
+            if 'GWWL' in self.observables and i<= self.Nbins_gwl:
+                self.ngwlbin = self.GW_specs['N_gw']/self.Nbins_gwl 
+                Nell['WL{}xWL{}'.format(i,i)] += [(self.GW_specs['sigma_eps_gw']**2/self.ngwlbin)]*len(ells)
+            if 'GWC' in self.observables  and i<= self.Nbins_gwc:
+                self.ngwcbin = self.GW_specs['N_gw']/self.Nbins_gwc 
+                Nell['WC{}xWC{}'.format(i,i)] += [(self.GW_specs['sigma_eps_gw']**2/self.ngwcbin)]*len(ells)
 
         #MMmod: can we account for different fsky in different probes??
         fsky      = self.galaxy_specs['fsky']
@@ -179,8 +187,11 @@ class get_Fisher:
         if 'WL' in self.observables:
             obs_list.append('L')
             j+=1
-        if 'GW' in self.observables:
-            obs_list.append('W')
+        if 'GWWL' in self.observables:
+            obs_list.append('WL')
+            j+=1
+        if 'GWC' in self.observables:
+            obs_list.append('WC')
             j+=1
 
         err_for_cov = np.zeros((j,j,len(ells),self.maxbins,self.maxbins))
@@ -197,14 +208,18 @@ class get_Fisher:
             elif o1==1:
                 Nbins1=self.Nbins_wl
             elif o1==2:
-                Nbins1=self.Nbins_gw
+                Nbins1=self.Nbins_gwl
+            elif o1==3:
+                Nbins1=self.Nbins_gwc
             for o2,obs2 in enumerate(obs_list):
                 if o2==0:
                     Nbins2=self.Nbins_gc
                 elif o2==1:
                     Nbins2=self.Nbins_wl
-                elif o2==1:
-                    Nbins2=self.Nbins_gw
+                elif o2==2:
+                    Nbins2=self.Nbins_gwl
+                elif o2==3:
+                    Nbins2=self.Nbins_gwc
                 for i in range(Nbins1):
                     for j in range(Nbins2):
                         for ell_ind,ell in enumerate(ells):
@@ -276,60 +291,120 @@ class get_Fisher:
 
         elif self.covmat_type == 1:
 
-            #MMmod: assumes only GC/WL
 
             if 'WL' in self.observables: 
                 WLcols  = ['L{}xL{}'.format(i,j) for i in range(1,self.Nbins_wl+1) for j in range(i,self.Nbins_wl+1)]
             if 'GC' in self.observables: 
                 GCcols  = ['G{}xG{}'.format(i,j) for i in range(1,self.Nbins_gc+1) for j in range(i,self.Nbins_gc+1)]    
-            if 'GW' in self.observables: 
-                GWcols  = ['W{}xW{}'.format(i,j) for i in range(1,self.Nbins_gw+1) for j in range(i,self.Nbins_gw+1)]
+            if 'GWWL' in self.observables: 
+                GWWLcols  = ['WL{}xWL{}'.format(i,j) for i in range(1,self.Nbins_gwl+1) for j in range(i,self.Nbins_gwl+1)]
+            if 'GWC' in self.observables: 
+                GWCcols  = ['WC{}xWC{}'.format(i,j) for i in range(1,self.Nbins_gwc+1) for j in range(i,self.Nbins_gwc+1)]
             if 'GC' in  self.observables and 'WL' in self.observables: 
                 GGLcols = ['G{}xL{}'.format(i,j) for i in range(1,self.Nbins_gc+1) for j in range(1,self.Nbins_wl+1)]
-            if 'GC' in  self.observables and 'GW' in  self.observables:
-                GGWcols = ['G{}xW{}'.format(i,j) for i in range(1,self.Nbins_gc+1) for j in range(1,self.Nbins_gw+1)]
-            if 'WL' in  self.observables and 'GW' in  self.observables:
-                LGWcols = ['L{}xW{}'.format(i,j) for i in range(1,self.Nbins_wl+1) for j in range(1,self.Nbins_gw+1)]
-            all_cols = []
-            if 'WL' in self.observables: 
-               all_cols = all_cols+WLcols
-            if 'GC' in self.observables:
-                if 'WL' in self.observables:
-                    all_cols = all_cols+GGLcols+GCcols
-                else:
-                    all_cols = all_cols+GCcols
-            if 'GW' in self.observables:
-                all_cols = all_cols+GWcols
-                if 'GC' in self.observables:
-                    all_cols = all_cols+GGWcols
-                if 'WL' in self.observables:
-                    all_cols = all_cols+LGWcols
+            if 'WL' in self.observables and 'GWC' in self.observables:
+                LGWCcols = ['L{}xWC{}'.format(i,j) for i in range(1,self.Nbins_wl+1) for j in range(1,self.Nbins_gwc+1)]
+            if 'GC' in  self.observables and 'GWC' in  self.observables:
+                GGWCcols = ['G{}xWC{}'.format(i,j) for i in range(1,self.Nbins_gc+1) for j in range(1,self.Nbins_gwc+1)]
+            if 'GC' in  self.observables and 'GWWL' in  self.observables:
+                GGWLcols = ['G{}xWL{}'.format(i,j) for i in range(1,self.Nbins_gc+1) for j in range(1,self.Nbins_gwl+1)]
+            if 'WL' in self.observables and 'GWWL' in self.observables:
+                LGWLcols = ['L{}xWL{}'.format(i,j) for i in range(1,self.Nbins_wl+1) for j in range(1,self.Nbins_gwl+1)]
+            if 'GWC' in self.observables and 'GWWL' in self.observables:
+                GWCGWLcols = ['WC{}xWL{}'.format(i,j) for i in range(1,self.Nbins_gwc+1) for j in range(1,self.Nbins_gwl+1)]
 
+            all_cols=[]
+        if 'WL' in self.observables: 
+               all_cols = all_cols+WLcols
+        if 'GC' in self.observables:
+            if 'WL' in self.observables:
+                all_cols = all_cols+GGLcols+GCcols
+            else:
+                all_cols = all_cols+GCcols
+        if 'GWC' in self.observables:
+            all_cols = all_cols+GWCcols
+            if 'GC' in self.observables:
+                all_cols = all_cols+GGWCcols
+            if 'WL' in self.observables:
+                all_cols = all_cols+LGWCcols
+        if 'GWWL' in self.observables:
+            all_cols = all_cols + GWWLcols
+            if 'GC' in self.observables:
+                all_cols = all_cols+GGWLcols
+            if 'WL' in self.observables:
+                all_cols = all_cols+LGWLcols
+            if 'GWC' in self.observables:
+                all_cols = all_cols+GWCGWLcols
 
             def str_to_ind(in_obs):
 
-                if 'GC' in self.observables and 'WL' in self.observables and 'GW' in self.observables:
+                if 'GC' in self.observables and 'WL' in self.observables and 'GWWL' in self.observables and 'GWC' in self.observables:
                     if in_obs == 'G':
                         ind = 0
                     elif in_obs == 'L':
                         ind = 1
-                    elif in_obs == 'W':
+                    elif in_obs == 'WL':
+                        ind = 2
+                    elif in_obs == 'WC':
+                        ind = 3
+                elif 'GC' in self.observables and 'WL' in self.observables and 'GWWL' in self.observables:
+                    if in_obs == 'G':
+                        ind = 0
+                    elif in_obs == 'L':
+                        ind = 1
+                    elif in_obs == 'WL':
+                        ind = 2
+                elif 'GC' in self.observables and 'WL' in self.observables and 'GWC' in self.observables:
+                    if in_obs == 'G':
+                        ind = 0
+                    elif in_obs == 'L':
+                        ind = 1
+                    elif in_obs == 'WC':
+                        ind = 2
+                elif 'GC' in self.observables and 'GWWL' in self.observables and 'GWC' in self.observables:
+                    if in_obs == 'G':
+                        ind = 0
+                    elif in_obs == 'WL':
+                        ind = 1
+                    elif in_obs == 'WC':
+                        ind = 2
+                elif 'WL' in self.observables and 'GWWL' in self.observables and 'GWC' in self.observables:
+                    if in_obs == 'L':
+                        ind = 0
+                    elif in_obs == 'WL':
+                        ind = 1
+                    elif in_obs == 'WC':
                         ind = 2
                 elif 'GC' in self.observables and 'WL' in self.observables:
                     if in_obs == 'G':
                         ind = 0
                     elif in_obs == 'L':
                         ind = 1
-                elif 'GC' in self.observables and 'GW' in self.observables:
+                elif 'GC' in self.observables and 'GWWL' in self.observables:
                     if in_obs == 'G':
                         ind = 0
-                    elif in_obs == 'W':
+                    elif in_obs == 'WL':
                         ind = 1 
-                elif 'WL' in self.observables and 'GW' in self.observables:
+                elif 'WL' in self.observables and 'GWWL' in self.observables:
                     if in_obs == 'L':
                         ind = 0
-                    elif in_obs == 'W':
-                        ind = 1                   
+                    elif in_obs == 'WL':
+                        ind = 1 
+                elif 'GC' in self.observables and 'GWC' in self.observables:
+                    if in_obs == 'G':
+                        ind = 0
+                    elif in_obs == 'WC':
+                        ind = 1 
+                elif 'WL' in self.observables and 'GWC' in self.observables:
+                    if in_obs == 'L':
+                        ind = 0
+                    elif in_obs == 'WC':
+                        ind = 1
+                elif 'GWWL' in self.observables and 'GWC' in self.observables:
+                    if in_obs == 'WL':
+                        ind = 0
+                    elif in_obs == 'WC':
+                        ind = 1                    
                 else:
                     ind = 0
 
