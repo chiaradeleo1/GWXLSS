@@ -42,7 +42,7 @@ class LSSlike(Likelihood):
     def logp(self, **params_values):
         params = {key: value for key, value in params_values.items() }
         
-        self.obs = get_obs(params,self.extra,self.observables, self.data_ells, self.camb_path, self.case, self.source,feedback=self.feedback)
+        self.obs = get_obs(params,self.extra,self.observables, self.data_ells, self.camb_path, self.case, self.calculation,feedback=self.feedback)
         
         loglike = 0
         for ind,ell in enumerate(self.data_ells):

@@ -19,7 +19,7 @@ possible_observables = ['GC','WL','GW']
 
 class get_obs:
 
-    def __init__(self,params, extra, observables,ells,camb_path,case,source,feedback=False):
+    def __init__(self,params, extra, observables,ells,camb_path,case,calculation,feedback=False):
 
         #Reading used observables from source distribution
         #Checking that there is no weird stuff
@@ -32,7 +32,7 @@ class get_obs:
         self.case=case
         self.camb_path=camb_path
         self.ells=ells
-        self.source=source
+        self.calculation=calculation
         self.zinterps = np.logspace(-3,np.log10(5),500)
         self.k_max_Boltzmann = 10
 
@@ -51,10 +51,12 @@ class get_obs:
         
 
         tini = time()
-        if self.source==True:
+        if self.calculation=='CAMB':
             self.Cls = self.get_cls( ells)
-        else:
+        elif self.calculation == 'internal':
             self.Cls =self.get_cls_old()
+        else:
+            sys.exit('Unknown calulation: {}'.format(obs))
         tend = time()
     
         if feedback:
@@ -83,7 +85,7 @@ class get_obs:
         bgrid = [sum([params['b{}_poly'.format(ind)]*np.power(z,ind) for ind in range(4)]) for z in self.zinterps]
         cosmo_dict['bias'] = interp1d(self.zinterps,bgrid)
 
-        if self.source==False:
+        if self.calculation=='internal':
             cosmo=self.additional_cosmo_dict(cosmo_dict)  
             cosmo_dict=cosmo
         #print(cosmo_dict)

@@ -53,7 +53,7 @@ class get_Fisher:
         print('')
         print('Computing fiducial observables...')
         tini = time()
-        self.fidobs = get_obs(fiducial,self.obs_settings['extra'],self.observables,self.ells,self.obs_settings['camb_path'],self.obs_settings['case'],self.obs_settings['source'],feedback=False).Cls
+        self.fidobs = get_obs(fiducial,self.obs_settings['extra'],self.observables,self.ells,self.obs_settings['camb_path'],self.obs_settings['case'],self.obs_settings['calculation'],feedback=False).Cls
         print('...done in {:.2f} s'.format(time()-tini))
 
 
@@ -84,8 +84,8 @@ class get_Fisher:
                 fiducial_plus[param]  += epsilon
                 fiducial_minus[param] -= epsilon
             
-            Cls_plus  = get_obs(fiducial_plus, extra, self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], self.obs_settings['source'], feedback=False).Cls
-            Cls_minus = get_obs(fiducial_minus, extra, self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'] , self.obs_settings['source'], feedback=False).Cls
+            Cls_plus  = get_obs(fiducial_plus, extra, self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], self.obs_settings['calculation'], feedback=False).Cls
+            Cls_minus = get_obs(fiducial_minus, extra, self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'] , self.obs_settings['calculation'], feedback=False).Cls
             for ia, aa in enumerate(self.cols):
                 for ib, bb in enumerate(self.cols):
                     if ia>ib:
@@ -107,7 +107,7 @@ class get_Fisher:
 
         ngalbin_gc = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_gc)*3600*(180/np.pi)**2
         ngalbin_wl = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_wl)*3600*(180/np.pi)**2
-        calc_obs   = get_obs(self.fiducial,self.obs_settings['extra'], self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], self.obs_settings['source'],feedback=False)
+        calc_obs   = get_obs(self.fiducial,self.obs_settings['extra'], self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], self.obs_settings['calculation'],feedback=False)
         eps_error  = self.galaxy_specs['sigma_eps']
         noisy_cls  = deepcopy(calc_obs.Cls)
         #print(calc_obs.Cls)
