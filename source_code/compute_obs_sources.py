@@ -19,7 +19,7 @@ possible_observables = ['GC','WL','GWC', 'GWWL' ]
 
 class get_obs:
 
-    def __init__(self,params, extra, observables,ells,camb_path,case,source,feedback=False):
+    def __init__(self,params, observables,ells, settings, feedback=False):
 
         #Reading used observables from source distribution
         #Checking that there is no weird stuff
@@ -28,11 +28,11 @@ class get_obs:
         if 'logA' in self.params:
             self.params['As'] = np.exp(self.params.pop('logA'))*1.e-10
         
-        self.extra_params=extra
-        self.case=case
-        self.camb_path=camb_path
+        self.extra_params=settings['extra']
+        self.case=settings['case']
+        self.camb_path=settings['camb_path']
         self.ells=ells
-        self.source=source
+        self.calculation=settings['calculation']
         self.zinterps = np.logspace(-3,np.log10(5),500)
         self.k_max_Boltzmann = 10
 
@@ -51,10 +51,12 @@ class get_obs:
         
 
         tini = time()
-        if self.source==True:
+        if self.calculation=='CAMB':
             self.Cls = self.get_cls( ells)
-        else:
+        elif self.calculation == 'internal':
             self.Cls =self.get_cls_old()
+        else:
+            sys.exit('Unknown calulation: {}'.format(obs))
         tend = time()
     
         if feedback:
@@ -74,6 +76,8 @@ class get_obs:
         cosmo_params = {par: params[par] for par in params.keys() if par not in nuis_keys}
         cosmo_dict = {'cosmo_params': cosmo_params}
         
+            
+  
 
         IA =[sum([params['a{}'.format(ind)]*np.power(z,ind) for ind in range(5)]) for z in self.zinterps] 
         cosmo_dict['IA_term']= interp1d(self.zinterps,IA)
@@ -81,7 +85,7 @@ class get_obs:
         bgrid = [sum([params['b{}_poly'.format(ind)]*np.power(z,ind) for ind in range(4)]) for z in self.zinterps]
         cosmo_dict['bias'] = interp1d(self.zinterps,bgrid)
 
-        if self.source==False:
+        if self.calculation=='internal':
             cosmo=self.additional_cosmo_dict(cosmo_dict)  
             cosmo_dict=cosmo
         return cosmo_dict
@@ -98,13 +102,7 @@ class get_obs:
         cosmo_pars = cosmo_dict['cosmo_params']
        
         self.z_camb=np.linspace(0.001,4.,100)
-        if 'eft_params' in cosmo_dict:
-            eft_params=cosmo_dict['eft_params']
-            pars = camb.set_params(**cosmo_pars,**eft_params)
-            
-
-        else:
-             pars = camb.set_params(**cosmo_pars)
+        pars = camb.set_params(**cosmo_pars)
             
         pars.NonLinear = model.NonLinear_both
         pars.set_matter_power(redshifts=self.z_camb, kmax=2.0)
@@ -150,15 +148,10 @@ class get_obs:
         
         cosmo_pars = cosmo['cosmo_params']
         
-        if 'eft_params' in cosmo:
-            eft_params=cosmo['eft_params']
-            
-            pars = camb.set_params(**cosmo_pars,**eft_params)
-            
-
-        else:
-             pars = camb.set_params(**cosmo_pars)
-        pars = self.set_camb_specs(pars,self.case)  #This sets the cases for CAMB (Limber & friends) TO BE GENERALIZED FOR EACH OBS OR MAYBE WE CAN PASS THE SOURCETERMS FROM FILE
+        #MMmod: removed print below to avoid cluttering
+        #print(camb.__path__)
+        pars = camb.set_params(**cosmo_pars)
+        pars = self.set_camb_specs(pars,self.case)  #This sets the cases for CAMB (Limber & friends)
         pars.NonLinear = model.NonLinear_both
         use_obs     = []
         window_list = []

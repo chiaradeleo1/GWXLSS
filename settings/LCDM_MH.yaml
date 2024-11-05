@@ -6,10 +6,12 @@ likelihood:
     external: LSSlike
     data_path: ./mock_data/LCDM_test_galGW
     debug_mode: False
-    camb_path: 
     use_noiseless_cls: True
-    case: simple
-    source: True
+    settings:
+      case: simple
+      calculation: CAMB
+      extra: 
+      camb_path:
 
 
 sampler:
@@ -18,7 +20,7 @@ sampler:
     max_tries: 10000
     covmat: covariance_matrix.covmat
 
-extra:
+
  
 params:
   ombh2:

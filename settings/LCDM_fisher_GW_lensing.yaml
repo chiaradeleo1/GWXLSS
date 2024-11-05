@@ -3,9 +3,9 @@ output: chains/LCDM_GW_fisher_second_lensing
 obs_settings:
   extra:
   case: simple
-  camb_path: /users/chiaradeleo/Desktop/myeftcamb-main
-  source: True
-
+  camb_path: 
+  calculation: CAMB
+  
 analysis_settings:
   dist_path: ./mock_data/LCDM_test_gal_GW_source_distribution.npy
   lmin: 10

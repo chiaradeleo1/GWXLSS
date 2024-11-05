@@ -53,7 +53,7 @@ class get_Fisher:
         print('')
         print('Computing fiducial observables...')
         tini = time()
-        self.fidobs = get_obs(fiducial,self.obs_settings['extra'],self.observables,self.ells,self.obs_settings['camb_path'],self.obs_settings['case'],self.obs_settings['source'],feedback=False).Cls
+        self.fidobs = get_obs(fiducial,self.observables,self.ells,self.obs_settings,feedback=False).Cls
         print('...done in {:.2f} s'.format(time()-tini))
 
 
@@ -69,18 +69,11 @@ class get_Fisher:
             print('...computing derivative for {}...'.format(param))
             fiducial_plus = copy.deepcopy(self.fiducial)
             fiducial_minus = copy.deepcopy(self.fiducial)
-            extra_plus = copy.deepcopy(self.obs_settings['extra'])
-            extra_minus = copy.deepcopy(self.obs_settings['extra'])
+            extra = copy.deepcopy(self.obs_settings['extra'])
             
             #MM: added to avoid 0 value epsilons if fiducial is 0
 
-            if param in self.obs_settings['extra']:
-                if self.obs_settings['extra'][param] == 0:
-                    epsilon = delta
-                else:
-                    epsilon = abs(self.obs_settings['extra'][param])*delta
-                extra_plus[param] += epsilon
-                extra_minus[param] -= epsilon
+            
 
             if param in self.fiducial:
                 if self.fiducial[param] == 0:
@@ -91,8 +84,8 @@ class get_Fisher:
                 fiducial_plus[param]  += epsilon
                 fiducial_minus[param] -= epsilon
             
-            Cls_plus  = get_obs(fiducial_plus, extra_plus, self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], self.obs_settings['source'], feedback=False).Cls
-            Cls_minus = get_obs(fiducial_minus, extra_minus, self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'] , self.obs_settings['source'], feedback=False).Cls
+            Cls_plus  = get_obs(fiducial_plus, self.observables, self.ells, self.obs_settings, feedback=False).Cls
+            Cls_minus = get_obs(fiducial_minus, self.observables, self.ells, self.obs_settings, feedback=False).Cls
             for ia, aa in enumerate(self.cols):
                 for ib, bb in enumerate(self.cols):
                     if ia>ib:
@@ -114,7 +107,7 @@ class get_Fisher:
 
         ngalbin_gc = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_gc)*3600*(180/np.pi)**2
         ngalbin_wl = (self.galaxy_specs['gal_per_arcmin']/self.Nbins_wl)*3600*(180/np.pi)**2
-        calc_obs   = get_obs(self.fiducial,self.obs_settings['extra'], self.observables, self.ells, self.obs_settings['camb_path'], self.obs_settings['case'], self.obs_settings['source'],feedback=False)
+        calc_obs   = get_obs(self.fiducial, self.observables, self.ells, self.obs_settings,feedback=False)
         eps_error  = self.galaxy_specs['sigma_eps']
         noisy_cls  = deepcopy(calc_obs.Cls)
         #print(calc_obs.Cls)

@@ -3,9 +3,13 @@ output: chains/LCDM_nautilus
 likelihood:
   LSS:
     external: LSSlike
-    data_path: ./mock_data/EFTflag_1_test_galonly_IApoly
+    data_path: 
     debug_mode: False
-    camb_path: /home/matteo/Codes/CAMB/
+    settings:
+      case: simple
+      calculation: CAMB
+      extra: 
+      camb_path:
     use_noiseless_cls: True
 
 sampler:

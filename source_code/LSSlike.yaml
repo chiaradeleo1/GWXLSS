@@ -1,9 +1,11 @@
 aliases: [LSS]
 speed: 500
-case: simple
-source: True
 
-extra:
+settings:
+  case: simple
+  calculation: CAMB
+  extra: 
+  camb_path: 
 
   
 params:
