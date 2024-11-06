@@ -201,37 +201,113 @@ class get_Fisher:
         
 
         
+        if 'GC' in self.observables and 'WL' in self.observables and 'GWWL' in self.observables and 'GWC' in self.observables:
+            for o1,obs1 in enumerate(obs_list):
+                if o1==0:
+                    Nbins1=self.Nbins_gc
+                elif o1==1:
+                    Nbins1=self.Nbins_wl
+                elif o1==2:
+                    Nbins1=self.Nbins_gwl
+                elif o1==3:
+                    Nbins1=self.Nbins_gwc
+                for o2,obs2 in enumerate(obs_list):
+                    if o2==0:
+                        Nbins2=self.Nbins_gc
+                    elif o2==1:
+                        Nbins2=self.Nbins_wl
+                    elif o2==2:
+                        Nbins2=self.Nbins_gwl
+                    elif o2==3:
+                        Nbins2=self.Nbins_gwc
+                    for i in range(Nbins1):
+                        for j in range(Nbins2):
+                            for ell_ind,ell in enumerate(ells):
+                                if obs1 == obs2 and j<i:
+                                    Nell[obs1+str(i+1)+'x'+obs2+str(j+1)] = Nell[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                                    self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)] = self.fidobs[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                            #print(obs1+str(i+1)+'x'+obs2+str(j+1))
 
-        for o1,obs1 in enumerate(obs_list):
-            if o1==0:
-                Nbins1=self.Nbins_gc
-            elif o1==1:
-                Nbins1=self.Nbins_wl
-            elif o1==2:
-                Nbins1=self.Nbins_gwl
-            elif o1==3:
-                Nbins1=self.Nbins_gwc
-            for o2,obs2 in enumerate(obs_list):
-                if o2==0:
-                    Nbins2=self.Nbins_gc
-                elif o2==1:
-                    Nbins2=self.Nbins_wl
-                elif o2==2:
-                    Nbins2=self.Nbins_gwl
-                elif o2==3:
-                    Nbins2=self.Nbins_gwc
-                for i in range(Nbins1):
-                    for j in range(Nbins2):
-                        for ell_ind,ell in enumerate(ells):
-                            if obs1 == obs2 and j<i:
-                                Nell[obs1+str(i+1)+'x'+obs2+str(j+1)] = Nell[obs1+str(j+1)+'x'+obs2+str(i+1)]
-                                self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)] = self.fidobs[obs1+str(j+1)+'x'+obs2+str(i+1)]
-                        #print(obs1+str(i+1)+'x'+obs2+str(j+1))
+                                err_for_cov[o1,o2,ell_ind,i,j] = Nell[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+                                cls_for_cov[o1,o2,ell_ind,i,j] = self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
 
-                            err_for_cov[o1,o2,ell_ind,i,j] = Nell[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
-                            cls_for_cov[o1,o2,ell_ind,i,j] = self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+        elif 'GC' in self.observables and 'WL' in self.observables and 'GWWL' in self.observables:
+            for o1,obs1 in enumerate(obs_list):
+                if o1==0:
+                    Nbins1=self.Nbins_gc
+                elif o1==1:
+                    Nbins1=self.Nbins_wl
+                elif o1==2:
+                    Nbins1=self.Nbins_gwl
+                for o2,obs2 in enumerate(obs_list):
+                    if o2==0:
+                        Nbins2=self.Nbins_gc
+                    elif o2==1:
+                        Nbins2=self.Nbins_wl
+                    elif o2==2:
+                        Nbins2=self.Nbins_gwl
+                    for i in range(Nbins1):
+                        for j in range(Nbins2):
+                            for ell_ind,ell in enumerate(ells):
+                                if obs1 == obs2 and j<i:
+                                    Nell[obs1+str(i+1)+'x'+obs2+str(j+1)] = Nell[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                                    self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)] = self.fidobs[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                            #print(obs1+str(i+1)+'x'+obs2+str(j+1))
+
+                                err_for_cov[o1,o2,ell_ind,i,j] = Nell[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+                                cls_for_cov[o1,o2,ell_ind,i,j] = self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+        
+        
+        elif 'GC' in self.observables and 'WL' in self.observables and 'GWC' in self.observables:
+            for o1,obs1 in enumerate(obs_list):
+                if o1==0:
+                    Nbins1=self.Nbins_gc
+                elif o1==1:
+                    Nbins1=self.Nbins_wl
+                elif o1==2:
+                    Nbins1=self.Nbins_gwc
+                for o2,obs2 in enumerate(obs_list):
+                    if o2==0:
+                        Nbins2=self.Nbins_gc
+                    elif o2==1:
+                        Nbins2=self.Nbins_wl
+                    elif o2==2:
+                        Nbins2=self.Nbins_gwc
+                    for i in range(Nbins1):
+                        for j in range(Nbins2):
+                            for ell_ind,ell in enumerate(ells):
+                                if obs1 == obs2 and j<i:
+                                    Nell[obs1+str(i+1)+'x'+obs2+str(j+1)] = Nell[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                                    self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)] = self.fidobs[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                            #print(obs1+str(i+1)+'x'+obs2+str(j+1))
+
+                                err_for_cov[o1,o2,ell_ind,i,j] = Nell[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+                                cls_for_cov[o1,o2,ell_ind,i,j] = self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
 
 
+        elif 'GWWL' in self.observables and 'GWC' in self.observables:
+            for o1,obs1 in enumerate(obs_list):
+                if o1==0:
+                    Nbins1=self.Nbins_gwl
+                elif o1==1:
+                    Nbins1=self.Nbins_gwc
+                for o2,obs2 in enumerate(obs_list):
+                    if o2==0:
+                        Nbins2=self.Nbins_gwl
+                    elif o2==1:
+                        Nbins2=self.Nbins_gwc
+                    for i in range(Nbins1):
+                        for j in range(Nbins2):
+                            for ell_ind,ell in enumerate(ells):
+                                if obs1 == obs2 and j<i:
+                                    Nell[obs1+str(i+1)+'x'+obs2+str(j+1)] = Nell[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                                    self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)] = self.fidobs[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                            #print(obs1+str(i+1)+'x'+obs2+str(j+1))
+
+                                err_for_cov[o1,o2,ell_ind,i,j] = Nell[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+                                cls_for_cov[o1,o2,ell_ind,i,j] = self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+
+        
         covmat = covariance_einsum(cls_for_cov,err_for_cov,fsky,ells,Delta_ell,return_only_diagonal_ells=True)
 
 
@@ -314,27 +390,27 @@ class get_Fisher:
                 GWCGWLcols = ['WC{}xWL{}'.format(i,j) for i in range(1,self.Nbins_gwc+1) for j in range(1,self.Nbins_gwl+1)]
 
             all_cols=[]
-        if 'WL' in self.observables: 
-               all_cols = all_cols+WLcols
-        if 'GC' in self.observables:
-            if 'WL' in self.observables:
-                all_cols = all_cols+GGLcols+GCcols
-            else:
-                all_cols = all_cols+GCcols
-        if 'GWC' in self.observables:
-            all_cols = all_cols+GWCcols
+            if 'WL' in self.observables: 
+                all_cols = all_cols+WLcols
             if 'GC' in self.observables:
-                all_cols = all_cols+GGWCcols
-            if 'WL' in self.observables:
-                all_cols = all_cols+LGWCcols
-        if 'GWWL' in self.observables:
-            all_cols = all_cols + GWWLcols
-            if 'GC' in self.observables:
-                all_cols = all_cols+GGWLcols
-            if 'WL' in self.observables:
-                all_cols = all_cols+LGWLcols
+                if 'WL' in self.observables:
+                    all_cols = all_cols+GGLcols+GCcols
+                else:
+                    all_cols = all_cols+GCcols
             if 'GWC' in self.observables:
-                all_cols = all_cols+GWCGWLcols
+                all_cols = all_cols+GWCcols
+                if 'GC' in self.observables:
+                    all_cols = all_cols+GGWCcols
+                if 'WL' in self.observables:
+                    all_cols = all_cols+LGWCcols
+            if 'GWWL' in self.observables:
+                all_cols = all_cols + GWWLcols
+                if 'GC' in self.observables:
+                    all_cols = all_cols+GGWLcols
+                if 'WL' in self.observables:
+                    all_cols = all_cols+LGWLcols
+                if 'GWC' in self.observables:
+                    all_cols = all_cols+GWCGWLcols
 
             def str_to_ind(in_obs):
 

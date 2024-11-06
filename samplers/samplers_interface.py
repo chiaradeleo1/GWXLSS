@@ -108,7 +108,7 @@ def run_fisher(info):
 
     distributions = np.load(info['analysis_settings']['dist_path'],allow_pickle=True).item()
     galaxy_specs  = info['analysis_settings']['galaxy_specs']
-    if 'GW' in distributions:
+    if 'GWWL' in distributions or 'GWC' in distributions:
         GW_specs = info['analysis_settings']['GW_specs']
     else:
         GW_specs = {}
