@@ -307,7 +307,28 @@ class get_Fisher:
                                 err_for_cov[o1,o2,ell_ind,i,j] = Nell[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
                                 cls_for_cov[o1,o2,ell_ind,i,j] = self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
 
-        
+        elif 'GC' in self.observables and 'WL' in self.observables:
+            for o1,obs1 in enumerate(obs_list):
+                if o1==0:
+                    Nbins1=self.Nbins_gc
+                elif o1==1:
+                    Nbins1=self.Nbins_wl
+                for o2,obs2 in enumerate(obs_list):
+                    if o2==0:
+                        Nbins2=self.Nbins_gc
+                    elif o2==1:
+                        Nbins2=self.Nbins_wl
+                    for i in range(Nbins1):
+                        for j in range(Nbins2):
+                            for ell_ind,ell in enumerate(ells):
+                                if obs1 == obs2 and j<i:
+                                    Nell[obs1+str(i+1)+'x'+obs2+str(j+1)] = Nell[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                                    self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)] = self.fidobs[obs1+str(j+1)+'x'+obs2+str(i+1)]
+                            #print(obs1+str(i+1)+'x'+obs2+str(j+1))
+
+                                err_for_cov[o1,o2,ell_ind,i,j] = Nell[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+                                cls_for_cov[o1,o2,ell_ind,i,j] = self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)][ell_ind]
+
         covmat = covariance_einsum(cls_for_cov,err_for_cov,fsky,ells,Delta_ell,return_only_diagonal_ells=True)
 
 
