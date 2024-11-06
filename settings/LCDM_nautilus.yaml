@@ -5,7 +5,15 @@ likelihood:
     external: LSSlike
     data_path: 
     debug_mode: False
+<<<<<<< HEAD
     camb_path:
+=======
+    settings:
+      case: simple
+      calculation: CAMB
+      extra: 
+      camb_path:
+>>>>>>> f46ece3247f4fa1bebd3595b5c8d4b52d7a7bf2a
     use_noiseless_cls: True
     settings:
       case: simple

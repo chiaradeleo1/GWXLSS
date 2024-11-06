@@ -1,16 +1,12 @@
 aliases: [LSS]
 speed: 500
-case: simple
 
-extra:
-  EFT_mass_math_stability: false
-  EFT_ghost_stability: false
-  EFT_gradient_stability: false
-  EFT_mass_stability: false
-  EFT_additional_priors: false
-  EFTflag: 1
-  PureEFTmodel: 1
-  PureEFTmodelOmega: 3
+settings:
+  case: simple
+  calculation: CAMB
+  extra: 
+  camb_path: 
+
   
 params:
   b0_poly: 0.830703
@@ -33,13 +29,10 @@ params:
   w: -1.
   wa: 0.
   mnu: 0.06
-  omegab: 0.05
-  EFTOmega0: -0.019
-  EFTOmegaExp: 0.66
-  #sigma8: 0.84
+
 k_max_extrap: 1000000.0
 k_min_extrap: 0.00001
-camb_path: /users/chiaradeleo/Desktop/myeftcamb-main
+camb_path:  
 data_path: 
 use_noiseless_cls: True
 debug_mode: False
