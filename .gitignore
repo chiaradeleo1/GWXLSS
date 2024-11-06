@@ -13,3 +13,4 @@ chains/*
 mock_data/*
 *.covmat
 */.ipynb*
+plot/*

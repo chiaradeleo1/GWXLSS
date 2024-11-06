@@ -4,14 +4,8 @@ force: True
 likelihood:
   LSS: 
     external: LSSlike
-<<<<<<< HEAD
-    data_path: 
-    debug_mode: False
-    camb_path:
-=======
     data_path: ./mock_data/LCDM_test_galGW
     debug_mode: False
->>>>>>> f46ece3247f4fa1bebd3595b5c8d4b52d7a7bf2a
     use_noiseless_cls: True
     settings:
       case: simple
@@ -26,11 +20,6 @@ sampler:
     max_tries: 10000
     covmat: covariance_matrix.covmat
 
-<<<<<<< HEAD
-=======
-
- 
->>>>>>> f46ece3247f4fa1bebd3595b5c8d4b52d7a7bf2a
 params:
   ombh2:
     latex: '\Omega_\mathrm{b} h^2'
@@ -88,7 +77,6 @@ params:
     value: 'lambda logA: 1e-10*np.exp(logA)'
 
   tau: 0.05
-<<<<<<< HEAD
 
   omegab:
     latex: '\Omega_\mathrm{b}'
@@ -97,13 +85,6 @@ params:
   omegam:
     latex: '\Omega_\mathrm{m}'
     value: 'lambda ombh2, omch2, H0: ombh2 / (H0 / 100.0) ** 2 + omch2 / (H0 / 100.0) ** 2'  
-=======
-  
- # sigma8:
-  #  latex: '\sigma_8'
-   # value: 
-  
->>>>>>> f46ece3247f4fa1bebd3595b5c8d4b52d7a7bf2a
   a0: -0.007589
   a1 :  0.002008
   a2 : -0.004127
