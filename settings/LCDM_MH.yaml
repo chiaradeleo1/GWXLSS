@@ -3,10 +3,15 @@ output: chains/3x2pt_LCDM_MH
 likelihood:
   LSS: 
     external: LSSlike
-    data_path: ./mock_data/EFTflag_1_test_galonly_IApoly
+    data_path: 
     debug_mode: False
-    camb_path: /home/matteo/Codes/CAMB/
+    camb_path:
     use_noiseless_cls: True
+    settings:
+      case: simple
+      calculation: CAMB
+      extra: 
+      camb_path:
 
 
 sampler:
@@ -15,15 +20,6 @@ sampler:
     max_tries: 10000
     covmat: covariance_matrix.covmat
 
-extra:
-  EFT_mass_math_stability: false
-  EFT_ghost_stability: false
-  EFT_gradient_stability: false
-  EFT_mass_stability: false
-  EFT_additional_priors: false
-  EFTflag: 1
-  PureEFTmodel: 1
-  PureEFTmodelOmega: 3
 params:
   ombh2:
     latex: '\Omega_\mathrm{b} h^2'
@@ -88,32 +84,7 @@ params:
     
   omegam:
     latex: '\Omega_\mathrm{m}'
-    value: 'lambda ombh2, omch2, H0: ombh2 / (H0 / 100.0) ** 2 + omch2 / (H0 / 100.0) ** 2'
-    
- # sigma8:
-  #  latex: '\sigma_8'
-   # value: 
-  
-  EFTOmega0: 
-    latex: 'Omega_0'
-    prior:
-      min: -0.1
-      max: -0.001
-    proposal: 0.0001
-    ref:
-      dist: norm
-      loc: -0.019
-      scale: 0.0001
-  EFTOmegaExp: 
-    latex: '\beta'
-    prior:
-      min: 0.4
-      max: 1.0
-    proposal: 0.002
-    ref: 
-      dist: norm
-      loc: 0.66
-      scale: 0.004    
+    value: 'lambda ombh2, omch2, H0: ombh2 / (H0 / 100.0) ** 2 + omch2 / (H0 / 100.0) ** 2'  
   a0: -0.007589
   a1 :  0.002008
   a2 : -0.004127
