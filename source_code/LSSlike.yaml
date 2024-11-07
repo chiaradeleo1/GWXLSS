@@ -18,7 +18,7 @@ params:
   a2 : -0.004127
   a3 :  0.002918
   a4 : -0.0006784
-  omegam : 0.31
+    #MM: this is not a free parameter of the likelihood but derived from the others! omegam : 0.31
   ombh2 : 0.0222
   omch2 : 0.12
   H0 : 67.
