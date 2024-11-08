@@ -83,8 +83,9 @@ params:
     derived: 'lambda ombh2, H0: ombh2 / (H0 / 100.0) ** 2'
     
   omegam:
-    latex: '\Omega_\mathrm{m}'
-    derived: 'lambda ombh2, omch2, H0: ombh2 / (H0 / 100.0) ** 2 + omch2 / (H0 / 100.0) ** 2'
+    latex: '\Omega_\mathrm{m}'  
+    derived: 'lambda ombh2, omch2, omnuh2,H0: ombh2 / (H0 / 100.0) ** 2 + omch2 / (H0 / 100.0) ** 2 + omnuh2 / (H0 / 100.0) ** 2 '  
+  
     
       #sigma8:
       #latex: '\sigma_8'
@@ -108,3 +109,4 @@ params:
   w: -1.
   wa: 0.
   mnu: 0.06
+  omnuh2: 0.0
