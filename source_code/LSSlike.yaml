@@ -29,6 +29,7 @@ params:
   w: -1.
   wa: 0.
   mnu: 0.06
+  omnuh2: 0.0
 
 k_max_extrap: 1000000.0
 k_min_extrap: 0.00001
