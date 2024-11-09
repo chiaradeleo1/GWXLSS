@@ -16,3 +16,5 @@ mock_data/*
 plot/*
 test.py
 *.prof
+*.pyc
+__pycache__/
