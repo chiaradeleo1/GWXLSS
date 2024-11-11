@@ -182,7 +182,7 @@ class get_obs:
             Nbins_GW  = self.observables['GWC']['Nbins']
             n_dict_gw    = {i+1: self.observables['GWC']['dist'][i](self.z) for i in range(0, Nbins_GW)}
         
-            window_list = window_list+[SplinedSourceWindow(source_type='gws', bias=1, z=self.z, W=n_dict_gw[i]) 
+            window_list = window_list+[SplinedSourceWindow(source_type='gwcounts', bias=1, z=self.z, W=n_dict_gw[i]) 
                                        for i in range(1, Nbins_GW+1)]
 
             use_obs.append('GWC')
@@ -191,7 +191,7 @@ class get_obs:
             Nbins_GW  = self.observables['GWWL']['Nbins']
             n_dict_gw    = {i+1: self.observables['GWWL']['dist'][i](self.z) for i in range(0, Nbins_GW)}
         
-            window_list = window_list+[SplinedSourceWindow(source_type='gws_lens', bias=1, z=self.z, W=n_dict_gw[i]) 
+            window_list = window_list+[SplinedSourceWindow(source_type='gwamp', bias=1, z=self.z, W=n_dict_gw[i]) 
                                    for i in range(1, Nbins_GW+1)]
 
             use_obs.append('GWWL')
@@ -233,21 +233,22 @@ class get_obs:
         pars.SourceTerms.line_distortions = False
         pars.SourceTerms.use_21cm_mK = False
         ##GWCounts source terms
-        pars.SourceTerms.gw_density=True
-        pars.SourceTerms.gw_evolve=False
-        pars.SourceTerms.gw_gradpotential = False
-        pars.SourceTerms.gw_potential = False
-        pars.SourceTerms.gw_ISW = False
-        pars.SourceTerms.gw_timedelay=False
-        pars.SourceTerms.gw_velocity=False
-        pars.SourceTerms.gw_lsd = False
-        pars.SourceTerms.gw_lensing = False
+        pars.SourceTerms.gwcounts_density=True
+        pars.SourceTerms.gwcounts_evolve=False
+        pars.SourceTerms.gwcounts_gradpotential = False
+        pars.SourceTerms.gwcounts_potential = False
+        pars.SourceTerms.gwcounts_ISW = False
+        pars.SourceTerms.gwcounts_timedelay=False
+        pars.SourceTerms.gwcounts_velocity=False
+        pars.SourceTerms.gwcounts_lsd = False
+        pars.SourceTerms.gwcounts_lensing = False
         #GW-WL source terms
-        pars.SourceTerms.gwlens_volume = False
-        pars.SourceTerms.gwlens_sw = False
-        pars.SourceTerms.gwlens_ISW = False
-        pars.SourceTerms.gwlens_velocity = False
-        pars.SourceTerms.gwlens_TD = False
+        pars.SourceTerms.gwamp_lensing = True
+        pars.SourceTerms.gwamp_volume = False
+        pars.SourceTerms.gwamp_sw = False
+        pars.SourceTerms.gwamp_ISW = False
+        pars.SourceTerms.gwamp_velocity = False
+        pars.SourceTerms.gwamp_TD = False
         
 
         if case == 'simple':
