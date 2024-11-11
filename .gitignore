@@ -14,3 +14,7 @@ mock_data/*
 *.covmat
 */.ipynb*
 plot/*
+test.py
+*.prof
+*.pyc
+__pycache__/
