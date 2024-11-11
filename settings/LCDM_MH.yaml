@@ -1,10 +1,10 @@
-output: chains/6x2pt_LCDM_MH
+output: chains/3x2pt_LCDM_MH
 force: True
 
 likelihood:
   LSS: 
     external: LSSlike
-    data_path: ./mock_data/LCDM_test_galGW
+    data_path: ./mock_data/LCDM_test_gal
     debug_mode: False
     use_noiseless_cls: True
     settings:
@@ -18,10 +18,8 @@ sampler:
   mcmc:
     oversample_power: 1
     max_tries: 10000
-    covmat: covariance_matrix.covmat
+      #covmat: covariance_matrix.covmat
 
-
- 
 params:
   ombh2:
     latex: '\Omega_\mathrm{b} h^2'
@@ -79,11 +77,14 @@ params:
     value: 'lambda logA: 1e-10*np.exp(logA)'
 
   tau: 0.05
-  
- # sigma8:
-  #  latex: '\sigma_8'
-   # value: 
-  
+
+  omegab:
+    latex: '\Omega_\mathrm{b}'
+    derived: 'lambda ombh2, H0: ombh2 / (H0 / 100.0) ** 2'
+    
+  omegam:
+    latex: '\Omega_\mathrm{m}'  
+    derived: 'lambda ombh2, omch2, mnu,H0: ombh2 / (H0 / 100.0) ** 2 + omch2 / (H0 / 100.0) ** 2 + (mnu/93.14) / (H0 / 100.0) ** 2 '  
   a0: -0.007589
   a1 :  0.002008
   a2 : -0.004127

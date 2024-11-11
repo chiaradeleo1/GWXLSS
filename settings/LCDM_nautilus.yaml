@@ -1,9 +1,9 @@
 output: chains/LCDM_nautilus
 
 likelihood:
-  LSS:
+  LSS: 
     external: LSSlike
-    data_path: 
+    data_path: ./mock_data/LCDM_test_gal
     debug_mode: False
     settings:
       case: simple
@@ -80,11 +80,12 @@ params:
 
   omegab:
     latex: '\Omega_\mathrm{b}'
-    value: 'lambda ombh2, H0: ombh2 / (H0 / 100.0) ** 2'
+    derived: 'lambda ombh2, H0: ombh2 / (H0 / 100.0) ** 2'
     
   omegam:
-    latex: '\Omega_\mathrm{m}'
-    value: 'lambda ombh2, omch2, H0: ombh2 / (H0 / 100.0) ** 2 + omch2 / (H0 / 100.0) ** 2'
+    latex: '\Omega_\mathrm{m}'  
+    derived: 'lambda ombh2, omch2, mnu,H0: ombh2 / (H0 / 100.0) ** 2 + omch2 / (H0 / 100.0) ** 2 + (mnu/93.14) / (H0 / 100.0) ** 2 '  
+  
     
       #sigma8:
       #latex: '\sigma_8'

@@ -30,7 +30,7 @@ if list(info['sampler'].keys())[0] in ['mcmc','nautilus']:
     info['likelihood'] =  {'LSS': {'external': LSSlike,
                                    'data_path': likesets['data_path'],
                                    'debug_mode': likesets['debug_mode'],
-                                   'camb_path': likesets['camb_path'],
+                                   'settings': likesets['settings'],
                                    'use_noiseless_cls': likesets['use_noiseless_cls']}}
 
 #MMmod:

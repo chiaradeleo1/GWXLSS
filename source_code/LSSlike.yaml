@@ -18,7 +18,6 @@ params:
   a2 : -0.004127
   a3 :  0.002918
   a4 : -0.0006784
-  omegam : 0.31
   ombh2 : 0.0222
   omch2 : 0.12
   H0 : 67.
@@ -32,7 +31,6 @@ params:
 
 k_max_extrap: 1000000.0
 k_min_extrap: 0.00001
-camb_path:  
 data_path: 
 use_noiseless_cls: True
 debug_mode: False
