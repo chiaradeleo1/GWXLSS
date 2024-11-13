@@ -93,6 +93,8 @@ def nautilus_interface(info):
 
 def run_fisher(info):
 
+    possible_observables = ['GC','WL','GWC', 'GWWL' ]
+    
     lmin = np.log10(info['analysis_settings']['lmin'])
     lmax = np.log10(info['analysis_settings']['lmax'])
     N    = info['analysis_settings']['Nbin_ell']
@@ -107,6 +109,12 @@ def run_fisher(info):
     deltas   = (ell_lims[1:]-ell_lims[:-1]) #evaluation of the amplitude of each bin
 
     distributions = np.load(info['analysis_settings']['dist_path'],allow_pickle=True).item()
+    for obs in distributions.keys():
+            if obs not in possible_observables:
+                sys.exit( "Unknown observable in source distribution file: {}. Possible observables are: "
+                "photometric Galaxy clustering (GC), galaxy Weak Lensing (WL), "
+                "Gravitational Waves Weak Lensing (GWWL), and Gravitational Waves Counts (GWC)".format(obs))
+
     galaxy_specs  = info['analysis_settings']['galaxy_specs']
     if 'GWWL' in distributions or 'GWC' in distributions:
         GW_specs = info['analysis_settings']['GW_specs']

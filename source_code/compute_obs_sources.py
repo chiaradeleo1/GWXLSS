@@ -41,8 +41,9 @@ class get_obs:
         
         for obs in self.observables.keys():
             if obs not in possible_observables:
-                sys.exit('Unknown observable in source distribution file: {}'.format(obs))
-
+                sys.exit( "Unknown observable in source distribution file: {}. Possible observables are: "
+                "photometric Galaxy clustering (GC), galaxy Weak Lensing (WL), "
+                "Gravitational Waves Weak Lensing (GWWL), and Gravitational Waves Counts (GWC)".format(obs))
 
         self.feedback     = feedback
         
