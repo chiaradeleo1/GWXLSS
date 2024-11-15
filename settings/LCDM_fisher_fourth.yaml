@@ -27,7 +27,7 @@ sampler:
       omch2:
         fiducial: 0.1205579307
         variation: 0.1
-        latex: \Omega_{\rm b}\,h^2
+        latex: \Omega_{\rm c}\,h^2
       H0:
         fiducial: 67.
         variation: 0.1
