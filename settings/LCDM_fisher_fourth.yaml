@@ -1,4 +1,4 @@
-output: chains/LCDM_fisher_fourth
+output: chains/LCDM_fisher_fourth_nuisopen
 
 obs_settings:
   extra:
@@ -40,18 +40,46 @@ sampler:
         fiducial: 3.05685
         variation: 0.1
         latex: \log{10^{10}\,A_{\rm s}}
+      a0: 
+        fiducial: -0.007589
+        variation: 0.1
+        latex: a_0
+      a1 :  
+        fiducial: 0.002008
+        variation: 0.1
+        latex: a_1
+      a2 :
+        fiducial: -0.004127
+        variation: 0.1
+        latex: a_2
+      a3 :  
+        fiducial: 0.002918
+        variation: 0.1
+        latex: a_3
+      a4 : 
+        fiducial: -0.0006784
+        variation: 0.1
+        latex: a_4
+      b0_poly: 
+        fiducial: 0.830703
+        variation: 0.1
+        latex: b_0
+      b1_poly: 
+        fiducial: 1.190547
+        variation: 0.1
+        latex: b_1
+      b2_poly: 
+        fiducial: -0.928357
+        variation: 0.1
+        latex: b_2
+      b3_poly: 
+        fiducial: 0.423292
+        variation: 0.1
+        latex: b_3
+
 
     fixedpars:
       tau: 0.05
-      a0: -0.007589
-      a1 :  0.002008
-      a2 : -0.004127
-      a3 :  0.002918
-      a4 : -0.0006784
-      b0_poly: 0.830703
-      b1_poly: 1.190547
-      b2_poly: -0.928357
-      b3_poly: 0.423292
       w: -1.
       wa: 0.
       mnu: 0.06
