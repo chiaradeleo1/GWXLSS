@@ -1,4 +1,4 @@
-output: chains/LCDM_GW_fisher_fourth_lensing
+output: chains/LCDM_GWWL_fisher_fourth
 
 obs_settings:
   extra:
@@ -7,7 +7,7 @@ obs_settings:
   calculation: CAMB
   
 analysis_settings:
-  dist_path: ./mock_data/LCDM_test_gal_GW_source_distribution.npy
+  dist_path: ./mock_data/LCDM_test_galGWWL_source_distribution.npy
   lmin: 10
   lmax: 1500
   Nbin_ell: 20
