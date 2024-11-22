@@ -6,6 +6,7 @@ analyze_chains.ipynb
 *.covmat
 Compute_Fisher.ipynb
 tester.py
+*.ipynb*
 *.progress*
 *.txt
 chains/*
