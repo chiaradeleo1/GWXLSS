@@ -26,14 +26,14 @@ sampler:
   Fisher:
     covmat: 1 #0=second order covmat, 1=fourth order covmat
     freepars:
-      ombh2:
-        fiducial: 0.022445
-        variation: 0.1
-        latex: \Omega_{\rm b}\,h^2
-      omch2:
-        fiducial: 0.1205579307
-        variation: 0.1
-        latex: \Omega_{\rm c}\,h^2
+      #ombh2:
+       # fiducial: 0.022445
+       # variation: 0.1
+       # latex: \Omega_{\rm b}\,h^2
+     # omch2:
+      #  fiducial: 0.1205579307
+      #  variation: 0.1
+       # latex: \Omega_{\rm c}\,h^2
       H0:
         fiducial: 67.
         variation: 0.1
@@ -42,10 +42,10 @@ sampler:
         fiducial: 0.96
         variation: 0.1
         latex: n_{\rm s}
-      logA:
-        fiducial: 3.05685
-        variation: 0.1
-        latex: \log{10^{10}\,A_{\rm s}}
+      #logA:
+       # fiducial: 3.05685
+       # variation: 0.1
+       # latex: \log{10^{10}\,A_{\rm s}}
 
     fixedpars:
       tau: 0.05
@@ -61,3 +61,6 @@ sampler:
       w: -1.
       wa: 0.
       mnu: 0.06
+      ombh2: 0.022445
+      omch2: 0.1205579307
+      logA: 3.05685
