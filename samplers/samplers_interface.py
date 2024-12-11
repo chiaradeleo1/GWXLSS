@@ -116,18 +116,21 @@ def run_fisher(info):
                 "Gravitational Waves Weak Lensing (GWWL), and Gravitational Waves Counts (GWC)".format(obs))
 
     galaxy_specs  = info['analysis_settings']['galaxy_specs']
+
+    #MMmod: to be changed to work only with GW only?#####
     if 'GWWL' in distributions or 'GWC' in distributions:
         GW_specs = info['analysis_settings']['GW_specs']
     else:
         GW_specs = {}
+    #####################################################
     
     free_params = info['sampler']['Fisher']['freepars']
-    covmat_type = info['sampler']['Fisher']['covmat']
 
     fiducial = {par: pardict['fiducial'] for par,pardict in free_params.items()} | info['sampler']['Fisher']['fixedpars']
 
     from source_code.fisher import get_Fisher
-    fishmat = get_Fisher(fiducial,free_params,ells,deltas,distributions,obs_settings,galaxy_specs,GW_specs,covmat_type).fisher_matrix()
+    fishmodule = get_Fisher(fiducial,free_params,ells,deltas,distributions,obs_settings,galaxy_specs,GW_specs)
+    fishmat    = fishmodule.fisher_matrix()
 
     fisher = pd.DataFrame(fishmat,columns=free_params.keys(),index=free_params.keys())
     params_info = {par: val for par,val in free_params.items()}
