@@ -18,3 +18,4 @@ test.py
 *.prof
 *.pyc
 __pycache__/
+.DS_Store
