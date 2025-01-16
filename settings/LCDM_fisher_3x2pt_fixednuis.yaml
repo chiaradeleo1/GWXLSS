@@ -18,6 +18,7 @@ analysis_settings:
 
 sampler:
   Fisher:
+    derivative: 2PT
     freepars:
       ombh2:
         fiducial: 0.022445
@@ -42,7 +43,7 @@ sampler:
 
     fixedpars:
       tau: 0.05
-      a0: -0.007589
+      a0 : -0.007589
       a1 :  0.002008
       a2 : -0.004127
       a3 :  0.002918
