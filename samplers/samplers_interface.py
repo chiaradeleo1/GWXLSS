@@ -127,9 +127,10 @@ def run_fisher(info):
     free_params = info['sampler']['Fisher']['freepars']
 
     fiducial = {par: pardict['fiducial'] for par,pardict in free_params.items()} | info['sampler']['Fisher']['fixedpars']
+    dertype  = info['sampler']['Fisher']['derivative'] 
 
     from source_code.fisher import get_Fisher
-    fishmodule = get_Fisher(fiducial,free_params,ells,deltas,distributions,obs_settings,galaxy_specs,GW_specs)
+    fishmodule = get_Fisher(fiducial,free_params,ells,deltas,distributions,obs_settings,galaxy_specs,GW_specs,dertype)
     fishmat    = fishmodule.fisher_matrix()
 
     fisher = pd.DataFrame(fishmat,columns=free_params.keys(),index=free_params.keys())

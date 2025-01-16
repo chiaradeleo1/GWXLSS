@@ -6,7 +6,6 @@ from source_code.compute_obs_sources import get_obs
 from source_code.covariance_utils    import covariance_einsum
 
 from time      import time
-import copy
 from copy      import deepcopy
 from itertools import product
 
@@ -14,7 +13,7 @@ from itertools import product
 
 class get_Fisher:
 
-    def __init__(self,fiducial,free_params,ells,deltas,obs,obs_settings,galaxy_specs,GW_specs):
+    def __init__(self,fiducial,free_params,ells,deltas,obs,obs_settings,galaxy_specs,GW_specs,dertype):
 
         self.ells         = ells
         self.observables  = obs
@@ -27,6 +26,7 @@ class get_Fisher:
         self.param_names  = list(free_params.keys())
         self.param_values = [obs_settings['extra'][name] if name in self.obs_settings['extra'] else fiducial[name] for name in self.param_names]
         self.param_deltas = [free_params[name]['variation'] for name in self.param_names]
+        self.dertype      = dertype
         
 
         #MMmod: this renaming is not really useful, but I wanted to preserve what is in compute obs
@@ -58,14 +58,13 @@ class get_Fisher:
         #MMmod: more reliable method to be added here!!! E.g. STEM
 
         ells = self.fidobs['ells']
-        
         derivs   = {param: {col: np.zeros(len(self.ells)) for col in self.fidobs.columns}
                     for param in self.param_names }
-        
+
         for i, (param, delta) in enumerate(zip(self.param_names, self.param_deltas)):
             print('...computing derivative for {}...'.format(param))
-            fiducial_plus = copy.deepcopy(self.fiducial)
-            fiducial_minus = copy.deepcopy(self.fiducial)
+            fiducial_plus  = deepcopy(self.fiducial)
+            fiducial_minus = deepcopy(self.fiducial)
             
             
             if param in self.fiducial:
@@ -77,11 +76,32 @@ class get_Fisher:
                 fiducial_plus[param]  += epsilon
                 fiducial_minus[param] -= epsilon
             
-            Cls_plus  = get_obs(fiducial_plus, self.observables, self.ells, self.obs_settings, feedback=False).Cls
-            Cls_minus = get_obs(fiducial_minus, self.observables, self.ells, self.obs_settings, feedback=False).Cls
+            if self.dertype == '2PT':
+                Cls_plus  = get_obs(fiducial_plus, self.observables, self.ells, self.obs_settings, feedback=False).Cls
+                Cls_minus = get_obs(fiducial_minus, self.observables, self.ells, self.obs_settings, feedback=False).Cls
 
-            derivs[param] = (Cls_plus-Cls_minus)/(2*epsilon)
+                derivs[param] = (Cls_plus-Cls_minus)/(2*epsilon)
+            elif self.dertype == 'polynomial':
+                Nevals      = 5
+                eval_points = np.linspace(fiducial_minus[param],fiducial_plus[param],Nevals)
+                eval_obs    = []
+                for val in eval_points:
+                    locpars = deepcopy(self.fiducial)
+                    locpars[param] = val
+
+                    eval_obs.append(get_obs(locpars, self.observables, self.ells, self.obs_settings, feedback=False).Cls)
+
+                for col in eval_obs[0].columns:
+                    for ind,ell in enumerate(ells):
+                        fit = np.polyfit(eval_points,[eval_obs[i].at[0,col] for i in range(Nevals)],4)
+                        pol = np.poly1d(fit)
+                        der = np.polyder(pol)#why not callable???
+                        derivs[param][col][ind] = der(self.fiducial[param])
+
+
+
             derivs[param]['ells'] = ells
+            derivs[param] = pd.DataFrame.from_dict(derivs[param])
 
         return derivs
 
