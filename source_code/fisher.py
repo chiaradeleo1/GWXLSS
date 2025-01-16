@@ -93,7 +93,7 @@ class get_Fisher:
 
                 for col in eval_obs[0].columns:
                     for ind,ell in enumerate(ells):
-                        fit = np.polyfit(eval_points,[eval_obs[i].at[0,col] for i in range(Nevals)],4)
+                        fit = np.polyfit(eval_points,[eval_obs[i].at[ind,col] for i in range(Nevals)],4)
                         pol = np.poly1d(fit)
                         der = np.polyder(pol)#why not callable???
                         derivs[param][col][ind] = der(self.fiducial[param])
