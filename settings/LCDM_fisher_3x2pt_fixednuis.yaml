@@ -1,4 +1,4 @@
-output: chains/LCDM_fisher_3x2pt_fixednuis
+output: chains/LCDM_fisher_3x2pt_fixednuis_poly
 
 obs_settings:
   extra:
@@ -18,7 +18,7 @@ analysis_settings:
 
 sampler:
   Fisher:
-    derivative: 2PT
+    derivative: polynomial
     freepars:
       ombh2:
         fiducial: 0.022445
