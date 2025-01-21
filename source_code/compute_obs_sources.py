@@ -148,6 +148,10 @@ class get_obs:
         self.z            = np.linspace(0.001,4,500)
         
         cosmo_pars = cosmo['cosmo_params']
+        MGCAMB_flag = {'MG_flag', 'musigma_par', 'pure_MG_flag', 'DE_model'}
+        for flag in MGCAMB_flag:
+            if flag in cosmo_pars:
+                cosmo_pars[flag] = int(cosmo_pars[flag])
         
         #MMmod: removed print below to avoid cluttering
         #print(camb.__path__)
