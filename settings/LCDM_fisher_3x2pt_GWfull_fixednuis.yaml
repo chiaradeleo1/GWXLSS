@@ -17,7 +17,7 @@ analysis_settings:
     sigma_eps: 0.3
   GW_specs :
     fsky: 0.35
-    N_gw: 10000
+    N_gw: 1000000
     sigma_eps_gw: 0.005
 
 sampler:

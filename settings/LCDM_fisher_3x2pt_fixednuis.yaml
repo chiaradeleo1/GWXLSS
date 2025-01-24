@@ -1,4 +1,4 @@
-output: chains/LCDM_fisher_3x2pt_fixednuis_poly
+output: chains/LCDM_fisher_3x2pt_fixednuis
 
 obs_settings:
   extra:

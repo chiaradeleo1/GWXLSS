@@ -1,4 +1,4 @@
-output: chains/LCDM_fisher_3x2pt_poly
+output: chains/LCDM_fisher_3x2pt
 
 obs_settings:
   extra:
@@ -53,7 +53,7 @@ sampler:
         variation: 0.1
         latex: a_2
       a3:
-        fiducial: -0.0006784
+        fiducial: 0.002918 
         variation: 0.1
         latex: a_3
       a4:
