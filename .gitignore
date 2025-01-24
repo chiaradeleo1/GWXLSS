@@ -9,6 +9,7 @@ tester.py
 *.progress*
 *.txt
 chains/*
+chains_MG/*
 mock_data/*
 *.covmat
 */.ipynb*
@@ -18,3 +19,4 @@ test.py
 *.pyc
 __pycache__/
 test_fisher_and_likelihood.ipynb
+*.log
