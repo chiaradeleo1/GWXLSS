@@ -3,6 +3,8 @@ from scipy.interpolate import interp1d
 from scipy.optimize    import minimize
 from scipy.integrate   import quad,trapz
 from scipy.special     import erf
+import re
+
 
 class gw_distribution:
 
@@ -20,39 +22,25 @@ class gw_distribution:
                         'binned_dist': self.ni_gw}
 
     def get_gwdist(self,survey):
-
-        if survey == 'ET-10':
-            dNdz = interp1d(self.zgw,(self.zgw/(1.5))**2*np.exp(-(self.zgw/(1.5))**1.5),bounds_error=False,fill_value=0.)
-            self.Nbins = 10
-            self.zmin  = 0.001
-            self.zmax  = 3.
-
-            self.photo = {'fout': 0.1,
-                          'co': 1,
-                          'cb': 1,
-                          'sigma_o': 0.05,
-                          'sigma_b': 0.05,
-                          'zo': 0.1,
-                          'zb': 0.}
-
-        elif survey == 'ET-13':
-            dNdz = interp1d(self.zgw,(self.zgw/(1.5))**2*np.exp(-(self.zgw/(1.5))**1.5),bounds_error=False,fill_value=0.)
-            self.Nbins = 13
-            self.zmin  = 0.001
-            self.zmax  = 3.
-
-            self.photo = {'fout': 0.1,
-                          'co': 1,
-                          'cb': 1,
-                          'sigma_o': 0.05,
-                          'sigma_b': 0.05,
-                          'zo': 0.1,
-                          'zb': 0.}
-
+        dNdz = interp1d(self.zgw,(self.zgw/(1.5))**2*np.exp(-(self.zgw/(1.5))**1.5),bounds_error=False,fill_value=0.)
+        match = re.match(r'^ET-(\d+)$', survey) 
+        if match:
+            self.Nbins = int(match.group(1))  
         else:
-            print('not there yet')
+            raise ValueError(f"Invalid survey name: {survey}")
+        self.zmin  = 0.001
+        self.zmax  = 3.
+
+        self.photo = {'fout': 0.1,
+                        'co': 1,
+                        'cb': 1,
+                        'sigma_o': 0.05,
+                        'sigma_b': 0.05,
+                        'zo': 0.1,
+                        'zb': 0.}
 
         return dNdz
+
 
     def ngw_photoz(self, z, i):
 

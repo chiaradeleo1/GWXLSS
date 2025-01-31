@@ -45,8 +45,8 @@ fiducial = {'ombh2': 0.022445,
             'pure_MG_flag': 2,
             'musigma_par': 1,
             'DE_model': 0,
-            'mu0': -1.23,
-            'sigma0': -0.17,
+            'mu0': 0.64,
+            'sigma0': 0.61,
            }
 fiducial['logA'] = np.log(fiducial['As']*1.e+10)
 
@@ -63,7 +63,7 @@ config_dict = {"output": "chains/muSigmaCDM_fisher_3x2pt_GWcounts_fixednuis",
                                                     "gal_per_arcmin": 30.0,
                                                     "sigma_eps": 0.3,},
                                     "GW_specs": {"fsky": 0.35,
-                                                "N_gw": 10000,
+                                                "N_gw": 100000,
                                                 "sigma_eps_gw": 0.005,},},
                 "sampler": { "Fisher": {"derivative": "2PT",
                                         "freepars": {"ombh2": {"fiducial": 0.022445,
@@ -105,20 +105,41 @@ config_dict = {"output": "chains/muSigmaCDM_fisher_3x2pt_GWcounts_fixednuis",
     }
 }
 
-N_gw_configurations = [1e4, 5*1e4, 1e5, 5*1e5, 1e6]
-sigma_dL_configurations = [0.1, 0.05, 0.01, 0.005]
+#N_gw_configurations = [1e4, 5*1e4, 1e5, 5*1e5, 1e6]
+#sigma_dL_configurations = [0.1, 0.05, 0.01, 0.005]
+N_bins_configurations = [1,2,5,10]
 obs = ['GWC', 'GWWL', 'GWs']
 output_path=[]
-cases = []
 
-for N_gw, sigma_dL, obs  in product(N_gw_configurations, sigma_dL_configurations , obs):
-    config_dict["output"] = f"chains_MG/muSigmaCDM_fisher_3x2pt_{obs}_fixednuis_Ngw{int(N_gw)}_sigma{sigma_dL}"
-    config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}_source_distribution.npy"
-    config_dict["analysis_settings"]["GW_specs"]["N_gw"] = N_gw
-    config_dict["analysis_settings"]["GW_specs"]["sigma_eps_gw"] = sigma_dL
+# for N_gw, sigma_dL, obs  in product(N_gw_configurations, sigma_dL_configurations , obs):
+#     config_dict["output"] = f"chains_MG/muSigmaCDM_fisher_3x2pt_{obs}_fixednuis_Ngw{int(N_gw)}_sigma{sigma_dL}"
+#     config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}_source_distribution.npy"
+#     config_dict["analysis_settings"]["GW_specs"]["N_gw"] = N_gw
+#     config_dict["analysis_settings"]["GW_specs"]["sigma_eps_gw"] = sigma_dL
+#     output_path.append(config_dict["output"])
+#     cases.append(r"$N_{gw}$={int(N_gw)}, $\sigma$={sigma_dL}, LSS $\times$ {obs}")
+
+#     info = config_dict
+
+#     fishmat, info_dict = run_fisher(info)
+        
+#     fishmat.to_csv(info['output'] + '_matrix.txt', sep='\t', header=True, index=False)
+        
+        
+#     np.save(info['output'] + '_info.npy', info_dict)
+#     print("Fisher analysis completed for ", info['output'])
+
+for N_bins, obs  in product(N_bins_configurations , obs):
+    config_dict["output"] = f"chains_MG/muSigmaCDM_fisher_3x2pt_{obs}_Ngwbins{int(N_bins)}"
+    if N_bins == 10:
+        config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}_source_distribution.npy"
+    else:
+        if obs == 'GWs':
+            config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}_Nbin{int(N_bins)}_source_distribution.npy"
+        else:
+            config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}GWs_Nbin{int(N_bins)}_source_distribution.npy"
     output_path.append(config_dict["output"])
-    cases.append(r"$N_{gw}$={int(N_gw)}, $\sigma$={sigma_dL}, LSS $\times$ {obs}")
-
+    
     info = config_dict
 
     fishmat, info_dict = run_fisher(info)
