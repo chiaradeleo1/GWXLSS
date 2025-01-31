@@ -43,7 +43,6 @@ class get_Fisher:
 
         self.Nbins   = {new_obs: self.observables[obs]['Nbins'] for new_obs,obs in zip(self.renamed_obs,self.observables)}
         self.maxbins = max(list(self.Nbins.values()))
-        self.cols    = [f'{o}{ind+1}' for o in self.renamed_obs for ind in range(self.maxbins)]
 
         print('')
         print('Computing fiducial observables...')
@@ -112,8 +111,9 @@ class get_Fisher:
         ells = self.fidobs['ells'].values
         Nell = {k: [0.]*len(ells) for k in self.fidobs.columns}
 
-        for i in range(1,self.maxbins+1):
-            for obs in self.renamed_obs:
+        
+        for obs in self.renamed_obs:
+            for i in range(1,self.Nbins[obs]+1):
                 if obs == 'G':
                     ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins[obs])*3600*(180/np.pi)**2
                     Nell['{}{}x{}{}'.format(obs,i,obs,i)] = [(1/ngalbin)]*len(ells)
@@ -147,8 +147,8 @@ class get_Fisher:
 
         for o1,obs1 in enumerate(self.renamed_obs):
             for o2,obs2 in enumerate(self.renamed_obs):
-                for i in range(self.maxbins):
-                    for j in range(self.maxbins):
+                for i in range(self.Nbins[obs1]):
+                    for j in range(self.Nbins[obs2]):
                         if obs1 == obs2 and j<i:
                             self.noise[obs1+str(i+1)+'x'+obs2+str(j+1)]  = self.noise[obs1+str(j+1)+'x'+obs2+str(i+1)]
                             self.fidobs[obs1+str(i+1)+'x'+obs2+str(j+1)] = self.fidobs[obs1+str(j+1)+'x'+obs2+str(i+1)]
@@ -185,10 +185,10 @@ class get_Fisher:
         #Column ordering for the matrix
         cols = {}
         for o1,obs1 in enumerate(self.renamed_obs):
-            cols[obs1] = [obs1+'{}x'.format(i)+obs1+'{}'.format(j) for i in range(1,self.maxbins+1) for j in range(i,self.maxbins+1)] 
+            cols[obs1] = [obs1+'{}x'.format(i)+obs1+'{}'.format(j) for i in range(1,self.Nbins[obs1]+1) for j in range(i,self.Nbins[obs1]+1)] 
             for o2,obs2 in enumerate(self.renamed_obs):
                 if o2>o1:
-                    cols[obs1+'x'+obs2] = [obs1+'{}x'.format(i)+obs2+'{}'.format(j) for i in range(1,self.maxbins+1) for j in range(1,self.maxbins+1)]
+                    cols[obs1+'x'+obs2] = [obs1+'{}x'.format(i)+obs2+'{}'.format(j) for i in range(1,self.Nbins[obs1]+1) for j in range(1,self.Nbins[obs2]+1)]
 
         all_cols = []
 

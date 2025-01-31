@@ -100,6 +100,10 @@ config_dict = {"output": "chains/muSigmaCDM_fisher_3x2pt_GWcounts_fixednuis",
                             "w": -1.0,
                             "wa": 0.0,
                             "mnu": 0.06,
+                            'MG_flag': 1,
+                            'pure_MG_flag': 2,
+                            'musigma_par': 1,
+                            'DE_model': 0,
             },
         }
     }
