@@ -138,11 +138,8 @@ for N_bins, obs  in product(N_bins_configurations , obs):
     if N_bins == 10:
         config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}_source_distribution.npy"
     else:
-        if obs == 'GWs':
-            config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}_Nbin{int(N_bins)}_source_distribution.npy"
-        else:
-            config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}GWs_Nbin{int(N_bins)}_source_distribution.npy"
-    output_path.append(config_dict["output"])
+        config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}_Nbin{int(N_bins)}_source_distribution.npy"
+        output_path.append(config_dict["output"])
     
     info = config_dict
 
