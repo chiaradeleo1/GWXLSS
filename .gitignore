@@ -10,6 +10,7 @@ test_fisher_and_likelihood.ipynb
 *.progress*
 *.txt
 chains/*
+chains_MG/*
 mock_data/*
 *.covmat
 */.ipynb*
@@ -22,3 +23,5 @@ __pycache__/
 chains_MG/*
 *.log
 Lisa_cl_plotting.ipynb
+test_fisher_and_likelihood.ipynb
+*.log

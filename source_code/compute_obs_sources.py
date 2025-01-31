@@ -24,16 +24,17 @@ class get_obs:
         #Reading used observables from source distribution
         #Checking that there is no weird stuff
         self.observables = observables
-        self.params = deepcopy(params)
+        self.params      = deepcopy(params)
         if 'logA' in self.params:
             self.params['As'] = np.exp(self.params.pop('logA'))*1.e-10
         
-        self.extra_params=settings['extra']
-        self.case=settings['case']
-        self.camb_path=settings['camb_path']
-        self.ells=ells
-        self.calculation=settings['calculation']
-        self.zinterps = np.logspace(-3,np.log10(5),500)
+        self.extra_params = settings['extra']
+        self.case         = settings['case']
+        self.camb_path    = settings['camb_path']
+        self.ells         = ells
+        self.calculation  = settings['calculation']
+
+        self.zinterps        = np.logspace(-3,np.log10(5),500)
         self.k_max_Boltzmann = 10
 
         #MMmod: switch here if we want to customize
@@ -97,7 +98,6 @@ class get_obs:
         
         self.k_max_extrap= 1000000.0
         self.k_min_extrap= 0.00001
-        import camb
         from   camb         import model
         
         cosmo_pars = cosmo_dict['cosmo_params']
@@ -141,7 +141,6 @@ class get_obs:
     def get_source_Cls(self,cosmo):
         
         sys.path.insert(0,self.camb_path)
-         
         import camb
         from   camb.sources import SplinedSourceWindow
         from   camb         import model

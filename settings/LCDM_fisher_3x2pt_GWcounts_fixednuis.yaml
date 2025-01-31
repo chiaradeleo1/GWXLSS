@@ -1,13 +1,13 @@
-output: chains/LCDM_GWWL_fisher_fourth
+output: chains/LCDM_fisher_3x2pt_GWcounts_fixednuis
 
 obs_settings:
   extra:
   case: simple
-  camb_path: 
+  camb_path: /home/Matteo/Codes/GW-MGCAMB 
   calculation: CAMB
-  
+
 analysis_settings:
-  dist_path: ./mock_data/LCDM_test_galGWWL_source_distribution.npy
+  dist_path: ./mock_data/LCDM_test_galGWC_source_distribution.npy
   lmin: 10
   lmax: 1500
   Nbin_ell: 20
@@ -17,14 +17,12 @@ analysis_settings:
     sigma_eps: 0.3
   GW_specs :
     fsky: 0.35
-    N_gw: 100000
+    N_gw: 1000000
     sigma_eps_gw: 0.005
-
-  
 
 sampler:
   Fisher:
-    covmat: 1 #0=second order covmat, 1=fourth order covmat
+    derivative: polynomial
     freepars:
       ombh2:
         fiducial: 0.022445

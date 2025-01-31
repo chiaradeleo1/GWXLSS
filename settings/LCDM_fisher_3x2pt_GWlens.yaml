@@ -1,0 +1,88 @@
+output: chains/LCDM_fisher_3x2pt_GWlens
+
+obs_settings:
+  extra:
+  case: simple
+  camb_path:
+  calculation: CAMB
+
+analysis_settings:
+  dist_path: ./mock_data/LCDM_test_galGWWL_source_distribution.npy
+  lmin: 10
+  lmax: 1500
+  Nbin_ell: 20
+  galaxy_specs:
+    fsky: 0.35
+    gal_per_arcmin: 30.
+    sigma_eps: 0.3
+  GW_specs :
+    fsky: 0.35
+    N_gw: 1000000
+    sigma_eps_gw: 0.005
+
+sampler:
+  Fisher:
+    derivative: polynomial
+    freepars:
+      ombh2:
+        fiducial: 0.022445
+        variation: 0.1
+        latex: \Omega_{\rm b}\,h^2
+      omch2:
+        fiducial: 0.1205579307
+        variation: 0.1
+        latex: \Omega_{\rm b}\,h^2
+      H0:
+        fiducial: 67.
+        variation: 0.1
+        latex: H_0
+      ns:
+        fiducial: 0.96
+        variation: 0.1
+        latex: n_{\rm s}
+      logA:
+        fiducial: 3.05685
+        variation: 0.1
+        latex: \log{10^{10}\,A_{\rm s}}
+      a0:
+        fiducial: -0.007589
+        variation: 0.1
+        latex: a_0
+      a1:
+        fiducial: 0.002008
+        variation: 0.1
+        latex: a_1
+      a2:
+        fiducial: -0.004127
+        variation: 0.1
+        latex: a_2
+      a3:
+        fiducial: 0.002918 
+        variation: 0.1
+        latex: a_3
+      a4:
+        fiducial: -0.0006784
+        variation: 0.1
+        latex: a_4
+      b0_poly:
+        fiducial: 0.830703
+        variation: 0.1
+        latex: b_0
+      b1_poly: 
+        fiducial: 1.190547
+        variation: 0.1
+        latex: b_1
+      b2_poly:
+        fiducial: -0.928357
+        variation: 0.1
+        latex: b_2
+      b3_poly:
+        fiducial: 0.423292
+        variation: 0.1
+        latex: b_3
+
+    fixedpars:
+      tau: 0.05
+      w: -1.
+      wa: 0.
+      mnu: 0.06
