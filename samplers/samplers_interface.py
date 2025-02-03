@@ -46,16 +46,18 @@ def nautilus_interface(info):
     print('Loaded prior into Nautilus with dimension',prior.dimensionality())
     print('Prior keys: ',prior.keys)
 
-    derived_pars = [k for k in info['params'].keys() if type(info['params'][k]) == dict and 'prior' not in info['params'][k]]
+    derived_pars = [k for k in info['params'].keys() if type(info['params'][k]) == dict and 'prior' not in info['params'][k]]+['chi2']
     blob_vec     = [(par, float) for par in derived_pars]
 
     ## Likelihood
     def likelihood_nautilus(param_dict):
 
-        derived_params = model.logposterior(param_dict).derived
+        logpost        = model.logposterior(param_dict)
+        derived_params = logpost.derived
+        chi2           = -2*logpost.loglike
 
 
-        like_tuple    = [model.logposterior(param_dict).loglike]+[par for par in derived_params]
+        like_tuple    = [model.logposterior(param_dict).loglike]+[par for par in derived_params]+[chi2]
         full_tuple    = tuple(like_tuple)
 
         return full_tuple 
@@ -73,8 +75,8 @@ def nautilus_interface(info):
     points, log_w, log_l, derived = sampler.posterior(equal_weight=True,return_blobs=True)
     derived_array = np.array([np.array(list(der)) for der in derived])
 
-    params_dict = {par: info['params'][par]['latex'] for par in info['params'] if type(info['params'][par]) == dict}
-    nautilus_dict = {'params': {par: info['params'][par] for par in info['params'] if type(info['params'][par]) == dict}} | {'theory': info['theory']}
+    params_dict = {par: info['params'][par]['latex'] for par in info['params'] if type(info['params'][par]) == dict} | {'chi2': '\chi^2'}
+    nautilus_dict = {'params': {par: info['params'][par] for par in info['params'] if type(info['params'][par]) == dict} | {'chi2': {'latex': '\chi^2'}}} | {'theory': info['theory']}
 
     if 'output' in info:
         with open(info['output']+'.params.yaml', 'w') as outfile:
