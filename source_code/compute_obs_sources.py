@@ -71,7 +71,7 @@ class get_obs:
 
     def get_cosmo_dict(self,params): 
                 
-        nuis_keys  = ['_derived','a0','a1', 'a2', 'a3', 'a4', 'b0_poly', 'b1_poly', 'b2_poly', 'b3_poly', 'logA', 'omegam', 'omegab', 'sigma8']
+        nuis_keys  = ['_derived','a0','a1', 'a2', 'a3', 'a4', 'b0_poly', 'b1_poly', 'b2_poly', 'b3_poly', 'b0_poly_GW', 'b1_poly_GW', 'b2_poly_GW', 'b3_poly_GW','logA', 'omegam', 'omegab', 'sigma8']
         if self.extra_params:
             nuis_keys = nuis_keys + list(self.extra_params.keys())
         
@@ -86,6 +86,9 @@ class get_obs:
 
         bgrid = [sum([params['b{}_poly'.format(ind)]*np.power(z,ind) for ind in range(4)]) for z in self.zinterps]
         cosmo_dict['bias'] = interp1d(self.zinterps,bgrid)
+
+        bgrid_GW = [sum([params['b{}_poly_GW'.format(ind)]*np.power(z,ind) for ind in range(4)]) for z in self.zinterps]
+        cosmo_dict['bias_GW'] = interp1d(self.zinterps,bgrid)
 
         if self.calculation=='internal':
             cosmo=self.additional_cosmo_dict(cosmo_dict)  
@@ -185,8 +188,8 @@ class get_obs:
         if 'GWC' in self.observables:
             Nbins_GW  = self.observables['GWC']['Nbins']
             n_dict_gw    = {i+1: self.observables['GWC']['dist'][i](self.z) for i in range(0, Nbins_GW)}
-        
-            window_list = window_list+[SplinedSourceWindow(source_type='gwcounts', bias=1, z=self.z, W=n_dict_gw[i]) 
+            bias_binned_gw = cosmo['bias'](self.observables['GWC']['zmean'])
+            window_list = window_list+[SplinedSourceWindow(source_type='gwcounts', bias=bias_binned_gw[i-1], z=self.z, W=n_dict_gw[i]) 
                                        for i in range(1, Nbins_GW+1)]
 
             use_obs.append('GWC')
