@@ -25,6 +25,8 @@ chains_MG/*
 Lisa_cl_plotting.ipynb
 test_fisher_and_likelihood.ipynb
 *.log
-testing_GWfeatures_Fisher/*
+testing_GW*
 Fisher_*
 *matrix*
+compare*
+*_fisher_*
