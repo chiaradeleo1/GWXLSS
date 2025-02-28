@@ -121,11 +121,15 @@ class get_Fisher:
                     ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins[obs])*3600*(180/np.pi)**2
                     Nell['{}{}x{}{}'.format(obs,i,obs,i)] = [(self.galaxy_specs['sigma_eps']**2/(2*ngalbin))]*len(ells)
                 elif obs == 'WL':
-                    self.ngwcbin = self.GW_specs['N_gw']/self.Nbins[obs]
-                    Nell['{}{}x{}{}'.format(obs,i,obs,i)] = [(self.GW_specs['sigma_eps_gw']**2/self.ngwcbin)]*len(ells)
+                    self.ngwlbin = self.GW_specs['N_gw']/self.Nbins[obs]
+                    Nell['{}{}x{}{}'.format(obs,i,obs,i)] = list((self.GW_specs['sigma_eps_gw']**2/self.ngwlbin) * np.exp(ells**2 * self.GW_specs['theta_min']**2 / (8 * np.log(2))))
+                    #Nell['{}{}x{}{}'.format(obs,i,obs,i)] = [(self.GW_specs['sigma_eps_gw']**2/self.ngwcbin)]*len(ells)
                 elif obs == 'WC':
                     self.ngwcbin = self.GW_specs['N_gw']/self.Nbins[obs]
-                    Nell['{}{}x{}{}'.format(obs,i,obs,i)] = [(1/self.ngwcbin)]*len(ells)
+                    Nell['{}{}x{}{}'.format(obs,i,obs,i)] = list((1/self.ngwcbin) * np.exp(ells**2 * self.GW_specs['theta_min']**2 / (8 * np.log(2))))
+            
+
+                    #Nell['{}{}x{}{}'.format(obs,i,obs,i)] = [(1/self.ngwcbin)]*len(ells)
 
         self.noise = pd.DataFrame.from_dict({'ells': ells}|Nell)
 

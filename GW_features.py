@@ -63,8 +63,9 @@ config_dict = {"output": "chains/muSigmaCDM_fisher_3x2pt_GWcounts_fixednuis",
                                                     "gal_per_arcmin": 30.0,
                                                     "sigma_eps": 0.3,},
                                     "GW_specs": {"fsky": 0.35,
-                                                "N_gw": 100000,
-                                                "sigma_eps_gw": 0.005,},},
+                                                "N_gw": 1000000,
+                                                "sigma_eps_gw": 0.01,
+                                                "theta_min":0.01,},},
                 "sampler": { "Fisher": {"derivative": "2PT",
                                         "freepars": {"ombh2": {"fiducial": 0.022445,
                                                                 "variation": 0.1,
@@ -114,27 +115,27 @@ config_dict = {"output": "chains/muSigmaCDM_fisher_3x2pt_GWcounts_fixednuis",
                                                     "b3_poly": {"fiducial": 0.423292,
                                                             "variation": 0.1,
                                                             "latex": "\b_3",},
-                                                #     "b0_poly_GW": {"fiducial": -0.830703,
-                                                #             "variation": 0.1,
-                                                #             "latex": "\b_0",},
-                                                #     "b1_poly_GW": {"fiducial": 1.190547,
-                                                #             "variation": 0.1,
-                                                #             "latex": "\b_1",},
-                                                #     "b2_poly_GW": {"fiducial": -0.928357,
-                                                #             "variation": 0.1,
-                                                #             "latex": "\b_2",},
-                                                #     "b3_poly_GW": {"fiducial": 0.423292,
-                                                #             "variation": 0.1,
-                                                #             "latex": "\b_3",},
+                                                    "b0_poly_GW": {"fiducial": -0.830703,
+                                                            "variation": 0.1,
+                                                            "latex": "\b_0",},
+                                                    "b1_poly_GW": {"fiducial": 1.190547,
+                                                            "variation": 0.1,
+                                                            "latex": "\b_1",},
+                                                    "b2_poly_GW": {"fiducial": -0.928357,
+                                                            "variation": 0.1,
+                                                            "latex": "\b_2",},
+                                                    "b3_poly_GW": {"fiducial": 0.423292,
+                                                            "variation": 0.1,
+                                                            "latex": "\b_3",},
                                         },
                 "fixedpars":{"tau": 0.05,
                             "w": -1.0,
                             "wa": 0.0,
-                            "mnu": 0.06,
-                            "b0_poly_GW": 0.830703,
-                            "b1_poly_GW": 1.190547,
-                            "b2_poly_GW": -0.928357,
-                            "b3_poly_GW": 0.423292,
+                             "mnu": 0.06,
+                        #     "b0_poly_GW": 0.830703,
+                        #     "b1_poly_GW": 1.190547,
+                        #     "b2_poly_GW": -0.928357,
+                        #     "b3_poly_GW": 0.423292,
                             'MG_flag': 1,
                             'pure_MG_flag': 2,
                             'musigma_par': 1,
@@ -144,43 +145,18 @@ config_dict = {"output": "chains/muSigmaCDM_fisher_3x2pt_GWcounts_fixednuis",
     }
 }
 
-#N_gw_configurations = [1e4, 5*1e4, 1e5, 5*1e5, 1e6]
-#sigma_dL_configurations = [0.1, 0.05, 0.01, 0.005]
-N_bins_configurations = [10]#[1,2,6,10]
-obs = ['GWC', 'GWWL', 'GWs']
-output_path=[]
 
-# for N_gw, sigma_dL, obs  in product(N_gw_configurations, sigma_dL_configurations , obs):
-#     config_dict["output"] = f"chains_MG/muSigmaCDM_fisher_3x2pt_{obs}_fixednuis_Ngw{int(N_gw)}_sigma{sigma_dL}"
-#     config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}_source_distribution.npy"
-#     config_dict["analysis_settings"]["GW_specs"]["N_gw"] = N_gw
-#     config_dict["analysis_settings"]["GW_specs"]["sigma_eps_gw"] = sigma_dL
-#     output_path.append(config_dict["output"])
-#     cases.append(r"$N_{gw}$={int(N_gw)}, $\sigma$={sigma_dL}, LSS $\times$ {obs}")
 
-#     info = config_dict
 
-#     fishmat, info_dict = run_fisher(info)
-        
-#     fishmat.to_csv(info['output'] + '_matrix.txt', sep='\t', header=True, index=False)
-        
-        
-#     np.save(info['output'] + '_info.npy', info_dict)
-#     print("Fisher analysis completed for ", info['output'])
 
-for N_bins, obs  in product(N_bins_configurations , obs):
-    config_dict["output"] = f"testing_GWfeatures_Fisher/muSigmaCDM_fisher_3x2pt_{obs}_Ngwbins{int(N_bins)}"
-    config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_gal{obs}_Nbin{int(N_bins)}_source_distribution.npy"
-    output_path.append(config_dict["output"])
-    
-    info = config_dict
-
-    fishmat, info_dict = run_fisher(info)
-        
-    fishmat.to_csv(info['output'] + '_matrix.txt', sep='\t', header=True, index=False)
+config_dict["output"] = f"muSigmaCDM_fisher_3x2ptGWs_1500_noisebeam_0.01"
+config_dict["analysis_settings"]["dist_path"] = f"./mock_data/MGflag_1_test_galGWs_Nbin6_source_distribution.npy"
+info = config_dict
+fishmat, info_dict = run_fisher(info)
+fishmat.to_csv(info['output'] + '_matrix.txt', sep='\t', header=True, index=False)
         
         
-    np.save(info['output'] + '_info.npy', info_dict)
-    print("Fisher analysis completed for ", info['output'])
+np.save(info['output'] + '_info.npy', info_dict)
+print("Fisher analysis completed for ", info['output'])
 
 print("All Fisher analyses completed")
