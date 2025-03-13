@@ -104,47 +104,45 @@ class get_Fisher:
 
         return derivs
 
+    def get_noise(self):
+
+        ells = self.fidobs['ells'].values
+        Nell = {k: [0.]*len(ells) for k in self.fidobs.columns}  
+
+        ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins['G'])*3600*(180/np.pi)**2
+
+        errfac = {'G': np.full(len(ells),1/ngalbin,dtype=float),
+                  'L': np.full(len(ells),self.galaxy_specs['sigma_eps']**2/(2*ngalbin),dtype=float)}
+
+        if self.GW_specs != {}:
+            ngwbin  = (self.GW_specs['N_gw']/self.Nbins['WC'])
+            errfac['WL'] = (self.GW_specs['sigma_eps_gw']**2/ngwbin)*np.exp(ells**2*self.GW_specs['theta_min']**2/(8*np.log(2)))
+            errfac['WC'] = (1/ngwbin)*np.exp(ells**2*self.GW_specs['theta_min']**2/(8*np.log(2)))
+
+        for obs in self.renamed_obs:
+            for i in range(1,self.Nbins[obs]+1):
+                Nell['{}{}x{}{}'.format(obs,i,obs,i)] = errfac[obs]
+
+        noise = pd.DataFrame.from_dict(Nell).clip(upper=1.)
+        noise['ells'] = ells
+
+        return noise
 
 
     def compute_covmat(self):
-        
-        ells = self.fidobs['ells'].values
-        Nell = {k: [0.]*len(ells) for k in self.fidobs.columns}
 
-        
-        for obs in self.renamed_obs:
-            for i in range(1,self.Nbins[obs]+1):
-                if obs == 'G':
-                    ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins[obs])*3600*(180/np.pi)**2
-                    Nell['{}{}x{}{}'.format(obs,i,obs,i)] = [(1/ngalbin)]*len(ells)
-                elif obs == 'L':
-                    ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins[obs])*3600*(180/np.pi)**2
-                    Nell['{}{}x{}{}'.format(obs,i,obs,i)] = [(self.galaxy_specs['sigma_eps']**2/(2*ngalbin))]*len(ells)
-                elif obs == 'WL':
-                    self.ngwlbin = self.GW_specs['N_gw']/self.Nbins[obs]
-                    Nell['{}{}x{}{}'.format(obs,i,obs,i)] = list((self.GW_specs['sigma_eps_gw']**2/self.ngwlbin) * np.exp(ells**2 * self.GW_specs['theta_min']**2 / (8 * np.log(2))))
-                    #Nell['{}{}x{}{}'.format(obs,i,obs,i)] = [(self.GW_specs['sigma_eps_gw']**2/self.ngwcbin)]*len(ells)
-                elif obs == 'WC':
-                    self.ngwcbin = self.GW_specs['N_gw']/self.Nbins[obs]
-                    Nell['{}{}x{}{}'.format(obs,i,obs,i)] = list((1/self.ngwcbin) * np.exp(ells**2 * self.GW_specs['theta_min']**2 / (8 * np.log(2))))
-            
-
-                    #Nell['{}{}x{}{}'.format(obs,i,obs,i)] = [(1/self.ngwcbin)]*len(ells)
-
-        self.noise = pd.DataFrame.from_dict({'ells': ells}|Nell)
-
-        #print(self.noise.columns)
-        #print(self.fidobs.columns)
+        ells = self.fidobs['ells']
+        self.noise = self.get_noise() 
 
         #MMmod: can we account for different fsky in different probes??
         #probably, see original cosmicfish approach
         #needs to add fsky after the covmat calculation and use this with fsky=1
-        fsky      = self.galaxy_specs['fsky']
+        fsky       = self.galaxy_specs['fsky']
         ###############################################################
 
 
-        Delta_ell = self.deltas
-        Nobs      = len(self.observables)
+        Delta_ell  = self.deltas
+        Nobs       = len(self.observables)
 
         err_for_cov = np.zeros((Nobs,Nobs,len(ells),self.maxbins,self.maxbins))
         cls_for_cov = np.zeros((Nobs,Nobs,len(ells),self.maxbins,self.maxbins))
@@ -171,6 +169,45 @@ class get_Fisher:
         tail = s[len(head):]
         return head, tail
 
+    def pack_covmat(self,covmat,ellind,all_cols):
+
+        str_to_ind = {obs: ind for ind,obs in enumerate(self.renamed_obs)}
+
+        packed_covmat = pd.DataFrame(columns=all_cols,index=all_cols,dtype='float')
+
+        for ind1,col in enumerate(all_cols):
+            bin1,bin2 = re.split('x',col)
+            oi1,i1 = self.split_num(bin1)
+            oj1,j1 = self.split_num(bin2)
+
+            for ind2,row in enumerate(all_cols):
+                bin1,bin2 = re.split('x',row)
+                oi2,i2 = self.split_num(bin1)
+                oj2,j2 = self.split_num(bin2)
+
+                packed_covmat.at[row,col] = covmat[str_to_ind[oi1],str_to_ind[oj1],str_to_ind[oi2],str_to_ind[oj2],
+                                                   ellind,int(i1)-1,int(j1)-1,int(i2)-1,int(j2)-1]
+
+
+        return packed_covmat
+
+    def columns_ordering(self):
+
+        #Column ordering for the matrix
+        cols = {}
+        for o1,obs1 in enumerate(self.renamed_obs):
+            cols[obs1] = [obs1+'{}x'.format(i)+obs1+'{}'.format(j) for i in range(1,self.Nbins[obs1]+1) for j in range(i,self.Nbins[obs1]+1)]
+            for o2,obs2 in enumerate(self.renamed_obs):
+                if o2>o1:
+                    cols[obs1+'x'+obs2] = [obs1+'{}x'.format(i)+obs2+'{}'.format(j) for i in range(1,self.Nbins[obs1]+1) for j in range(1,self.Nbins[obs2]+1)]
+
+        all_cols = []
+
+        for obscomb,columns in cols.items():
+            all_cols = all_cols + columns
+
+        return all_cols
+
 
     def fisher_matrix(self):
         
@@ -186,40 +223,12 @@ class get_Fisher:
         derivs = self.numerical_derivative()
         print('...done in {:.2f} s'.format(time()-tini))
 
-        #Column ordering for the matrix
-        cols = {}
-        for o1,obs1 in enumerate(self.renamed_obs):
-            cols[obs1] = [obs1+'{}x'.format(i)+obs1+'{}'.format(j) for i in range(1,self.Nbins[obs1]+1) for j in range(i,self.Nbins[obs1]+1)] 
-            for o2,obs2 in enumerate(self.renamed_obs):
-                if o2>o1:
-                    cols[obs1+'x'+obs2] = [obs1+'{}x'.format(i)+obs2+'{}'.format(j) for i in range(1,self.Nbins[obs1]+1) for j in range(1,self.Nbins[obs2]+1)]
-
-        all_cols = []
-
-        for obscomb,columns in cols.items():
-            all_cols = all_cols + columns
-
-        str_to_ind = {obs: ind for ind,obs in enumerate(self.renamed_obs)}
+        all_cols = self.columns_ordering()
 
         for ellind,ell in enumerate(self.fidobs['ells']):
     
-            packed_covmat = pd.DataFrame(columns=all_cols,index=all_cols,dtype='float')
+            packed_covmat = self.pack_covmat(covmat,ellind,all_cols)#pd.DataFrame(columns=all_cols,index=all_cols,dtype='float')
     
-            for ind1,col in enumerate(all_cols):
-                bin1,bin2 = re.split('x',col)
-                oi1,i1 = self.split_num(bin1)
-                oj1,j1 = self.split_num(bin2)
-    
-                for ind2,row in enumerate(all_cols):
-                    bin1,bin2 = re.split('x',row)
-                    oi2,i2 = self.split_num(bin1)
-                    oj2,j2 = self.split_num(bin2)
-            
-                    packed_covmat.at[row,col] = covmat[str_to_ind[oi1],str_to_ind[oj1],str_to_ind[oi2],str_to_ind[oj2],
-                                                       ellind,int(i1)-1,int(j1)-1,int(i2)-1,int(j2)-1]
-            
-                #packed_covmat.index = packed_covmat.columns
-
             invcov = np.linalg.inv(packed_covmat)
 
             for i1,par1 in enumerate(self.free_params):
