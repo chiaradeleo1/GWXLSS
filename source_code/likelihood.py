@@ -20,6 +20,7 @@ class LSSlike(Likelihood):
         #Hard coded stuff
         
         self.feedback=self.debug_mode
+        
         if self.use_noiseless_cls:
             self.data_Cls     = pd.read_csv(self.data_path+'_Cls_noiseless.dat',sep='\s+',header=0)
         else:
@@ -34,7 +35,6 @@ class LSSlike(Likelihood):
         #inversion of covmat
         self.invcov = {key: np.linalg.pinv(cov) for key,cov in self.covmat.items()}
         print('Covmats inverted in {:.3f}'.format(time()-tini))
-        
 
     
 
@@ -45,8 +45,17 @@ class LSSlike(Likelihood):
         self.obs = get_obs(params,self.observables, self.data_ells, self.settings,feedback=self.feedback)
         
         loglike = 0
+        dfs = []
         for ind,ell in enumerate(self.data_ells):
             diffvec = np.array([self.data_Cls.iloc[ind][col]-self.obs.Cls.iloc[ind][col] for col in self.data_Cls.columns if col != 'ells'])
             loglike += -0.5*np.dot(diffvec,np.dot(self.invcov[str(int(ell))],diffvec))
+            df = pd.DataFrame({col: self.data_Cls.iloc[ind][col]-self.obs.Cls.iloc[ind][col] for col in self.data_Cls.columns if col != 'ells'},
+                              index=[0])
+            df['Chi2'] = np.dot(diffvec,np.dot(self.invcov[str(int(ell))],diffvec))
+            df['ells'] = ell
+            dfs.append(df)
+
+        #mytest = pd.concat(dfs,ignore_index=True)
+        #mytest.to_csv('mytest.txt',sep='\t',header=True,index=False)
 
         return loglike

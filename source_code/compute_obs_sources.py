@@ -20,7 +20,6 @@ possible_observables = ['GC','WL','GWC', 'GWWL' ]
 class get_obs:
 
     def __init__(self,params, observables,ells, settings, feedback=False):
-
         #Reading used observables from source distribution
         #Checking that there is no weird stuff
         self.observables = observables
