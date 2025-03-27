@@ -27,6 +27,7 @@ info     = read('settings/LCDM_fisher_3x2pt.yaml')
 
 models = ['LCDM']#,'MG']
 theta_vec = [0.,0.001,0.01]
+clip_vec  = [1.e-4,1.e-3,1.e-2,1.e-1]
 
 info['output'] = 'theta_test/LCDM_3x2pt_10bin'
 dist_path = './dist_data/'
@@ -66,7 +67,7 @@ for model in models:
     fishmat.to_csv(gal_info['output']+'_matrix.txt',sep='\t',header=True,index=False)
     np.save(info['output']+'_info.npy',info_dict)
 
-    for theta in theta_vec: 
+    for theta,clip in product(theta_vec,clip_vec): 
         gw_info['output'] = info['output']+'_GW_theta{}'.format(theta)
         if model == 'MG':
             gw_info['output'] = gw_info['output']+'_MG'
@@ -74,7 +75,8 @@ for model in models:
         gw_info['analysis_settings']['GW_specs'] = {'N_gw': int(1.e6),
                                                     'sigma_eps_gw': 0.01,
                                                     'fsky': 0.35,
-                                                    'theta_min': theta}
+                                                    'theta_min': theta,
+                                                    'clip_value': clip}
 
         for i in range(4):
             gw_info['sampler']['Fisher']['freepars']['b{}_poly_GW'.format(i)] = gw_info['sampler']['Fisher']['freepars']['b{}_poly'.format(i)]

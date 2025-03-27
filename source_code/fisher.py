@@ -123,7 +123,10 @@ class get_Fisher:
             for i in range(1,self.Nbins[obs]+1):
                 Nell['{}{}x{}{}'.format(obs,i,obs,i)] = errfac[obs]
 
-        noise = pd.DataFrame.from_dict(Nell).clip(upper=1.)
+        if self.GW_specs != {} and 'clip_value' in self.GW_specs:
+            noise = pd.DataFrame.from_dict(Nell).clip(upper=self.GW_specs['clip_value'])
+        else:
+            noise = pd.DataFrame.from_dict(Nell)
         noise['ells'] = ells
 
         return noise
