@@ -116,17 +116,26 @@ class get_Fisher:
 
         if self.GW_specs != {}:
             ngwbin  = (self.GW_specs['N_gw']/self.Nbins['WC'])
-            errfac['WL'] = (self.GW_specs['sigma_eps_gw']**2/ngwbin)*np.exp(ells**2*self.GW_specs['theta_min']**2/(8*np.log(2)))
-            errfac['WC'] = (1/ngwbin)*np.exp(ells**2*self.GW_specs['theta_min']**2/(8*np.log(2)))
+            errfac['WL'] = np.full(len(ells),(self.GW_specs['sigma_eps_gw']**2/ngwbin),dtype=float)
+            errfac['WC'] = np.full(len(ells),(1/ngwbin),dtype=float)
+
+            theta_factor = np.exp(ells**2.*self.GW_specs['theta_min']**2/(2*np.log(8)))
 
         for obs in self.renamed_obs:
             for i in range(1,self.Nbins[obs]+1):
-                Nell['{}{}x{}{}'.format(obs,i,obs,i)] = errfac[obs]
+                if obs in ['WL','WC']:
+                    clip_value = 1000*max(errfac[obs])
+                    vals = []
+                    for ind,ell in enumerate(ells):
+                        if errfac[obs][ind]*theta_factor[ind] < clip_value:
+                            vals.append(errfac[obs][ind]*theta_factor[ind])
+                        else:
+                            vals.append(clip_value)
+                    Nell['{}{}x{}{}'.format(obs,i,obs,i)] = vals
+                else:
+                    Nell['{}{}x{}{}'.format(obs,i,obs,i)] = errfac[obs]
 
-        if self.GW_specs != {} and 'clip_value' in self.GW_specs:
-            noise = pd.DataFrame.from_dict(Nell).clip(upper=self.GW_specs['clip_value'])
-        else:
-            noise = pd.DataFrame.from_dict(Nell)
+        noise = pd.DataFrame.from_dict(Nell)
         noise['ells'] = ells
 
         return noise
