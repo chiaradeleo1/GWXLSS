@@ -5,7 +5,7 @@ obs_settings:
   #MM: expand
   extra:
   case: simple
-  camb_path: /home/Matteo/Codes/GW-MGCAMB
+  camb_path: /home/matteo/Codes/GW-MGCAMB
   calculation: CAMB
 
 analysis_settings:
@@ -27,7 +27,7 @@ analysis_settings:
     sigma_eps: 0.3
   gw_specs:
     N_gw: 1.e6
-    Nbins_gw: 6
+    Nbins_GW: 6
     sigma_eps_gw: 0.01
     fsky: 0.35
     #Option used to boost error after a given scale
