@@ -26,7 +26,7 @@ analysis_settings:
     gal_per_arcmin: 30.
     sigma_eps: 0.3
   gw_specs:
-    N_gw: 1.e6
+    N_gw: 1.0e+6
     Nbins_GW: 6
     sigma_eps_gw: 0.01
     fsky: 0.35
