@@ -70,7 +70,8 @@ class get_obs:
 
     def get_cosmo_dict(self,params): 
                 
-        nuis_keys  = ['_derived','a0','a1', 'a2', 'a3', 'a4', 'b0_poly', 'b1_poly', 'b2_poly', 'b3_poly', 'b0_poly_GW', 'b1_poly_GW', 'b2_poly_GW', 'b3_poly_GW','logA', 'omegam', 'omegab', 'sigma8']
+        nuis_keys  = ['_derived','a0','a1', 'a2', 'a3', 'a4', 'b0_poly', 'b1_poly', 'b2_poly', 'b3_poly', 
+                      'b0_poly_GW', 'b1_poly_GW', 'b2_poly_GW', 'b3_poly_GW','logA', 'omegam', 'omegab', 'sigma8']
         if self.extra_params:
             nuis_keys = nuis_keys + list(self.extra_params.keys())
         
@@ -86,10 +87,12 @@ class get_obs:
         bgrid = [sum([params['b{}_poly'.format(ind)]*np.power(z,ind) for ind in range(4)]) for z in self.zinterps]
         cosmo_dict['bias'] = interp1d(self.zinterps,bgrid)
 
-        bgrid_GW = [sum([params['b{}_poly_GW'.format(ind)]*np.power(z,ind) for ind in range(4)]) for z in self.zinterps]
-        cosmo_dict['bias_GW'] = interp1d(self.zinterps,bgrid_GW)
+        if 'GWC' in self.observables:
+            bgrid_GW = [sum([params['b{}_poly_GW'.format(ind)]*np.power(z,ind) for ind in range(4)]) for z in self.zinterps]
+            cosmo_dict['bias_GW'] = interp1d(self.zinterps,bgrid_GW)
 
         if self.calculation=='internal':
+            #MMmod: for Chiara... clarify this part
             cosmo=self.additional_cosmo_dict(cosmo_dict)  
             cosmo_dict=cosmo
         return cosmo_dict
@@ -154,8 +157,6 @@ class get_obs:
             if flag in cosmo_pars:
                 cosmo_pars[flag] = int(cosmo_pars[flag])
         
-        #MMmod: removed print below to avoid cluttering
-        #print(camb.__path__)
         pars = camb.set_params(**cosmo_pars)
         pars = self.set_camb_specs(pars,self.case)  #This sets the cases for CAMB (Limber & friends)
         pars.NonLinear = model.NonLinear_both
