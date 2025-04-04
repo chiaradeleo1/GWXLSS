@@ -35,12 +35,13 @@ if list(info['sampler'].keys())[0] in ['mcmc','nautilus','evaluate']:
 
 #MMmod:
 #creating output folder if it doesn't exist
-directory = os.path.dirname(os.path.abspath(info['output']))
+if 'output' in info:
+    directory = os.path.dirname(os.path.abspath(info['output']))
 
-if not os.path.exists(directory):
-    os.makedirs(directory)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
-if list(info['sampler'].keys())[0] == 'mcmc':
+if list(info['sampler'].keys())[0] in ['mcmc','evaluate']:
     updated_info,sampler = run(info)
 elif list(info['sampler'].keys())[0] == 'nautilus':
     nautilus = nautilus_interface(info)
