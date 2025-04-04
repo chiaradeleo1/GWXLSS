@@ -95,6 +95,9 @@ def nautilus_interface(info):
 
 def run_fisher(info):
 
+    from source_code.galdist import galaxy_distribution
+    from source_code.gwdist import gw_distribution
+
     possible_observables = ['GC','WL','GWC', 'GWWL' ]
     
     lmin = np.log10(info['analysis_settings']['lmin'])
@@ -110,21 +113,70 @@ def run_fisher(info):
     ells     = np.array([int(ell) for ell in 0.5*(ell_lims[:-1]+ell_lims[1:])])
     deltas   = (ell_lims[1:]-ell_lims[:-1]) #evaluation of the amplitude of each bin
 
-    distributions = np.load(info['analysis_settings']['dist_path'],allow_pickle=True).item()
-    for obs in distributions.keys():
-            if obs not in possible_observables:
-                sys.exit( "Unknown observable in source distribution file: {}. Possible observables are: "
-                "photometric Galaxy clustering (GC), galaxy Weak Lensing (WL), "
-                "Gravitational Waves Weak Lensing (GWWL), and Gravitational Waves Counts (GWC)".format(obs))
 
-    galaxy_specs  = info['analysis_settings']['galaxy_specs']
+    #GENERATING SOURCE DISTRIBUTIONS
+    print('Creating source distributions')
+    observables = info['analysis_settings']['observables']
 
     #MMmod: to be changed to work only with GW only?#####
-    if 'GWWL' in distributions or 'GWC' in distributions:
+    galaxy_specs  = info['analysis_settings']['galaxy_specs']
+
+    if 'GWWL' in observables or 'GWC' in observables:
         GW_specs = info['analysis_settings']['GW_specs']
     else:
         GW_specs = {}
     #####################################################
+
+    for obs in observables:
+        if obs not in possible_observables:
+            sys.exit( "Unknown observable in source distribution file: {}. Possible observables are: "
+                      "photometric Galaxy clustering (GC), galaxy Weak Lensing (WL), "
+                      "Gravitational Waves Weak Lensing (GWWL), and Gravitational Waves Counts (GWC)".format(obs))
+    distributions = {}
+
+    if 'GC' in observables:
+        dist = galaxy_distribution(survey='Euclid-10')#MMmod: allow for different galaxy binning?
+        bin_lims = dist.galdict['bin_lims']
+        bin_mids = 0.5*(bin_lims[:-1]+bin_lims[1:])
+        Nbins_gc = len(bin_lims)-1
+
+        distributions['GC'] = {'dist': dist.galdict['binned_dist'],
+                               'Nbins': Nbins_gc,
+                               'zmean': bin_mids}
+
+    if 'WL' in observables:
+        dist = galaxy_distribution(survey='Euclid-10')
+        bin_lims = dist.galdict['bin_lims']
+        bin_mids = 0.5*(bin_lims[:-1]+bin_lims[1:])
+        Nbins_wl = len(bin_lims)-1
+
+        distributions['WL'] = {'dist': dist.galdict['binned_dist'],
+                               'Nbins': Nbins_wl,
+                               'zmean': bin_mids}
+
+    if 'GWC' in observables:
+
+        gwdist  = gw_distribution('ET-{}'.format(GW_specs['Nbins_GW']))
+
+
+        bin_lims = gwdist.gwdict['bin_lims']
+        bin_mids = 0.5*(bin_lims[:-1]+bin_lims[1:])
+        Nbins_gwc = len(bin_lims)-1
+
+        distributions['GWC'] = {'dist': gwdist.gwdict['binned_dist'],
+                                'Nbins': Nbins_gwc,
+                                'zmean': bin_mids}
+    if 'GWWL' in observables:
+        gwdist  = gw_distribution('ET-{}'.format(GW_specs['Nbins_GW']))
+
+
+        bin_lims = gwdist.gwdict['bin_lims']
+        bin_mids = 0.5*(bin_lims[:-1]+bin_lims[1:])
+        Nbins_gwl = len(bin_lims)-1
+
+        distributions['GWWL'] = {'dist': gwdist.gwdict['binned_dist'],
+                                 'Nbins': Nbins_gwl,
+                                'zmean': bin_mids}
     
     free_params = info['sampler']['Fisher']['freepars']
 

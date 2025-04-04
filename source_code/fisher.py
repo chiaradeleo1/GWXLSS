@@ -128,14 +128,13 @@ class get_Fisher:
                     #print(obs,clip_value)
                     vals = []
                     for ind,ell in enumerate(ells):
-                        #if errfac[obs][ind]*theta_factor[ind] < clip_value:
-                        #vals.append(errfac[obs][ind]*theta_factor[ind])
-                        #else:
-                        #    vals.append(clip_value)
-                        if ell <= 200:
-                            vals.append(errfac[obs][ind])
+                        if self.GW_specs['clip_value']:
+                            if ell <= 200:
+                                vals.append(errfac[obs][ind])
+                            else:
+                                vals.append(1000*errfac[obs][ind])
                         else:
-                            vals.append(1000*errfac[obs][ind])
+                            vals.append(errfac[obs][ind]*theta_factor[ind])
                     Nell['{}{}x{}{}'.format(obs,i,obs,i)] = vals
                 else:
                     Nell['{}{}x{}{}'.format(obs,i,obs,i)] = errfac[obs]
