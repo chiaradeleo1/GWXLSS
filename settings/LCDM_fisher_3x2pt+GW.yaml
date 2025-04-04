@@ -1,4 +1,4 @@
-output: chains/LCDM_fisher_3x2pt
+output: chains/LCDM_fisher_3x2pt+GW
 
 obs_settings:
   #These to be changed to change theory code or add relativistic effect
