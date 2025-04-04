@@ -119,7 +119,6 @@ class get_Fisher:
             errfac['WL'] = np.full(len(ells),(self.GW_specs['sigma_eps_gw']**2/ngwbin),dtype=float)
             errfac['WC'] = np.full(len(ells),(1/ngwbin),dtype=float)
 
-            theta_factor = np.exp(ells**2.*self.GW_specs['theta_min']**2/(2*np.log(8)))
 
         for obs in self.renamed_obs:
             for i in range(1,self.Nbins[obs]+1):

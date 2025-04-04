@@ -27,6 +27,7 @@ analysis_settings:
     sigma_eps: 0.3
   gw_specs:
     N_gw: 1.e6
+    Nbins_gw: 6
     sigma_eps_gw: 0.01
     fsky: 0.35
     #Option used to boost error after a given scale
