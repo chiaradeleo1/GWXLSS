@@ -122,7 +122,7 @@ def run_fisher(info):
     galaxy_specs  = info['analysis_settings']['galaxy_specs']
 
     if 'GWWL' in observables or 'GWC' in observables:
-        GW_specs = info['analysis_settings']['GW_specs']
+        GW_specs = info['analysis_settings']['gw_specs']
     else:
         GW_specs = {}
     #####################################################
