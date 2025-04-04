@@ -115,7 +115,7 @@ class get_Fisher:
                   'L': np.full(len(ells),self.galaxy_specs['sigma_eps']**2/(2*ngalbin),dtype=float)}
 
         if self.GW_specs != {}:
-            ngwbin  = (self.GW_specs['N_gw']/self.Nbins['WC'])
+            ngwbin  = (int(self.GW_specs['N_gw'])/self.Nbins['WC'])
             errfac['WL'] = np.full(len(ells),(self.GW_specs['sigma_eps_gw']**2/ngwbin),dtype=float)
             errfac['WC'] = np.full(len(ells),(1/ngwbin),dtype=float)
 
@@ -124,17 +124,18 @@ class get_Fisher:
         for obs in self.renamed_obs:
             for i in range(1,self.Nbins[obs]+1):
                 if obs in ['WL','WC']:
-                    #clip_value = 10000*max(errfac[obs])
-                    #print(obs,clip_value)
                     vals = []
                     for ind,ell in enumerate(ells):
-                        if self.GW_specs['clip_value']:
-                            if ell <= 200:
+                        if self.GW_specs['scale_cut']['method'] == 'ell_cut':
+                            if ell <= self.GW_specs['scale_cut']['value']:
                                 vals.append(errfac[obs][ind])
                             else:
                                 vals.append(1000*errfac[obs][ind])
-                        else:
+                        elif self.GW_specs['scale_cut']['method'] == 'theta_min':
+                            theta_factor = np.exp(ells**2.*self.GW_specs['scale_cut']['value']**2/(2*np.log(8)))
                             vals.append(errfac[obs][ind]*theta_factor[ind])
+                        else:
+                            sys.exit('Unknown GW scale cut method: {}'.format(self.GW_specs['scale_cut']['method']))
                     Nell['{}{}x{}{}'.format(obs,i,obs,i)] = vals
                 else:
                     Nell['{}{}x{}{}'.format(obs,i,obs,i)] = errfac[obs]
