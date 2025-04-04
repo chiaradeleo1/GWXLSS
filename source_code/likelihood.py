@@ -45,17 +45,12 @@ class LSSlike(Likelihood):
         self.obs = get_obs(params,self.observables, self.data_ells, self.settings,feedback=self.feedback)
         
         loglike = 0
-        dfs = []
+        like_cols = [col for col in self.data_Cls.columns if col != 'ells']
         for ind,ell in enumerate(self.data_ells):
-            diffvec = np.array([self.data_Cls.iloc[ind][col]-self.obs.Cls.iloc[ind][col] for col in self.data_Cls.columns if col != 'ells'])
+            thvec = self.obs.Cls.iloc[ind][like_cols].values
+            dtvec = self.data_Cls.iloc[ind][like_cols].values
+            diffvec = thvec-dtvec 
             loglike += -0.5*np.dot(diffvec,np.dot(self.invcov[str(int(ell))],diffvec))
-            df = pd.DataFrame({col: self.data_Cls.iloc[ind][col]-self.obs.Cls.iloc[ind][col] for col in self.data_Cls.columns if col != 'ells'},
-                              index=[0])
-            df['Chi2'] = np.dot(diffvec,np.dot(self.invcov[str(int(ell))],diffvec))
-            df['ells'] = ell
-            dfs.append(df)
 
-        #mytest = pd.concat(dfs,ignore_index=True)
-        #mytest.to_csv('mytest.txt',sep='\t',header=True,index=False)
 
         return loglike
