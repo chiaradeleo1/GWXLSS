@@ -1,0 +1,178 @@
+output: chains/LCDM_3x2pt_nautilus
+
+data_path: ./mock_data/new_LSS_LCDM
+settings:
+  case: simple
+  calculation: CAMB
+  extra: 
+  camb_path: /home/Matteo/Codes/GW-MGCAMB
+use_noiseless_cls: True
+
+sampler:
+  nautilus:
+    num_threads: 1
+    pool: 1
+    n_live: 4000
+    n_batch: 512
+    n_networks: 16
+
+params:
+  ombh2:
+    latex: '\Omega_\mathrm{b} h^2'
+    prior:
+      min: 0.005
+      max: 0.1
+    proposal: 0.0001
+    ref:
+      dist: norm
+      loc: 0.0222
+      scale: 0.0001
+  omch2:
+    latex: '\Omega_\mathrm{c} h^2'
+    prior:
+      min: 0.002
+      max: 0.99
+    proposal: 0.0005
+    ref:
+      dist: norm
+      loc: 0.12
+      scale: 0.001
+  ns:
+    latex: 'n_\mathrm{s}'
+    prior:
+      min: 0.6
+      max: 1.2
+    proposal: 0.002
+    ref: 
+      dist: norm
+      loc: 0.96
+      scale: 0.004
+  H0:
+    latex: 'H_0'
+    prior: 
+      max: 100.0
+      min: 20.0
+    proposal: 0.5
+    ref:
+      dist: norm
+      loc: 67.0
+      scale: 0.5
+  logA:
+    drop: true
+    latex: '\log(10^{10} A_\mathrm{s})'
+    prior:
+      max: 5.0
+      min: 2.0
+    proposal: 0.001
+    ref:
+      dist: norm
+      loc: 3.05
+      scale: 0.1
+
+  tau: 0.05
+
+  a0: 
+    latex: 'a_0'
+    prior: 
+      max: 0.1
+      min: -0.1
+    proposal: 0.00002
+    ref:
+      dist: norm
+      loc: -0.007589
+      scale: 0.00001
+  a1 :  
+    latex: 'a_1'
+    prior: 
+      max: 0.1
+      min: -0.1
+    proposal: 0.00002
+    ref:
+      dist: norm
+      loc: 0.002008 
+      scale: 0.00001
+  a2 :  
+    latex: 'a_2'
+    prior: 
+      max: 0.1
+      min: -0.1
+    proposal: 0.00002
+    ref:
+      dist: norm
+      loc:  -0.004127
+      scale: 0.00001
+  a3 :  
+    latex: 'a_3'
+    prior: 
+      max: 0.1
+      min: -0.1
+    proposal: 0.00002
+    ref:
+      dist: norm
+      loc:  0.002918
+      scale: 0.00001
+  a4 :  
+    latex: 'a_4'
+    prior: 
+      max: 0.1
+      min: -0.1
+    proposal: 0.00002
+    ref:
+      dist: norm
+      loc:   -0.0006784
+      scale: 0.00001
+
+  b0_poly: 
+    latex: 'b_0'
+    prior: 
+      max: 3.0
+      min: -3.0
+    proposal: 0.01
+    ref:
+      dist: norm
+      loc:   0.830703
+      scale: 0.001
+  
+  b1_poly: 
+    latex: 'b_1'
+    prior: 
+      max: 3.0
+      min: -3.0
+    proposal: 0.002
+    ref:
+      dist: norm
+      loc:   1.190547
+      scale: 0.002
+    
+  b2_poly: 
+    latex: 'b_2'
+    prior: 
+      max: 3.0
+      min: -3.0
+    proposal: 0.002
+    ref:
+      dist: norm
+      loc:   -0.928357
+      scale: 0.001
+    
+  b3_poly: 
+    latex: 'b_3'
+    prior: 
+      max: 3.0
+      min: -3.0
+    proposal: 0.002
+    ref:
+      dist: norm
+      loc:   0.423292
+      scale: 0.001
+  w: -1.
+  wa: 0.
+  mnu: 0.06
+
+  #MG params
+  mu0: 0.
+  sigma0: 0.
+  MG_flag: 1
+  pure_MG_flag: 2
+  musigma_par: 1
+  DE_model: 0
