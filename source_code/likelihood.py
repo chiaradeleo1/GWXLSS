@@ -20,7 +20,6 @@ class LSSlike(Likelihood):
         #Hard coded stuff
         
         self.feedback=self.debug_mode
-        
         if self.use_noiseless_cls:
             self.data_Cls     = pd.read_csv(self.data_path+'_Cls_noiseless.dat',sep='\s+',header=0)
         else:
@@ -42,15 +41,30 @@ class LSSlike(Likelihood):
     def logp(self, **params_values):
         params = {key: value for key, value in params_values.items() }
         
-        self.obs = get_obs(params,self.observables, self.data_ells, self.settings,feedback=self.feedback)
+        #self.obs = get_obs(params,self.observables, self.data_ells, self.settings,feedback=self.feedback)
+        theory = get_obs(params,self.observables, self.data_ells, self.settings).Cls
         
         loglike = 0
         like_cols = [col for col in self.data_Cls.columns if col != 'ells']
+        ell_diff = []
         for ind,ell in enumerate(self.data_ells):
-            thvec = self.obs.Cls.iloc[ind][like_cols].values
-            dtvec = self.data_Cls.iloc[ind][like_cols].values
+            thvec   = theory.iloc[ind][like_cols].values
+            dtvec   = self.data_Cls.iloc[ind][like_cols].values
             diffvec = thvec-dtvec 
             loglike += -0.5*np.dot(diffvec,np.dot(self.invcov[str(int(ell))],diffvec))
+            if self.feedback: 
+                df = pd.DataFrame({'ells': ell}|{col: theory.iloc[ind][col]-self.data_Cls.iloc[ind][col] for col in like_cols},index=[0])
+                ell_diff.append(df)
 
+
+        if self.feedback:
+            plot_df = pd.concat(ell_diff,ignore_index=True)
+            plot_df = pd.melt(plot_df,id_vars=['ells'],value_vars=like_cols,var_name='Bin',value_name='value')
+            import matplotlib.pyplot as plt
+            import seaborn as sb
+            plt.figure()
+            sb.lineplot(plot_df,x='ells',y='value',hue='Bin',legend=0)
+            plt.xscale('log')
+            plt.show()
 
         return loglike
