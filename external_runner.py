@@ -58,9 +58,15 @@ print('Fixed parameters: ',list(fixed_params.keys()))
 def likelihood_nautilus(param_dict):
 
     if 'logA' in param_dict:
-        param_dict['As'] = np.exp(param_dict.pop('logA'))*1.e-10
+        param_dict['As'] = np.exp(param_dict['logA'])*1.e-10
+        del param_dict['logA']
 
-    theory = get_obs(param_dict|fixed_params,distributions,data_Cls['ells'],settings).Cls
+    try:
+        theory = get_obs(param_dict|fixed_params,distributions,data_Cls['ells'],settings).Cls
+    except:
+        print('Theory failed!')
+        print(param_dict)
+        sys.exit('Something is wrong')
 
     chi2 = []
     for ind,ell in enumerate(data_Cls['ells']):
@@ -70,6 +76,11 @@ def likelihood_nautilus(param_dict):
     loglike = -0.5*sum(chi2)
 
     return loglike
+
+if options['evaluate_at_fiducial']:
+    fiducial_dict = {par: options['params'][par]['ref']['loc'] for par in prior.keys}
+    chi2 = -2*likelihood_nautilus(fiducial_dict)
+    print('chi2 at fiducial is {}'.format(chi2))
 
 print('Starting to sample with Nautilus...')
 nautilus_options = {k:v for k,v in options['sampler']['nautilus'].items() if k != 'num_threads'}

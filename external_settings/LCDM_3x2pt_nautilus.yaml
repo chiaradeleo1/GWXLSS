@@ -8,13 +8,18 @@ settings:
   camb_path: /home/Matteo/Codes/GW-MGCAMB
 use_noiseless_cls: True
 
+evaluate_at_fiducial: True
+
 sampler:
   nautilus:
     num_threads: 1
     pool: 1
-    n_live: 4000
-    n_batch: 512
-    n_networks: 16
+    n_live: 500
+      #4000
+    n_batch: 64
+      #512
+    n_networks: 2
+      #16
 
 params:
   ombh2:
