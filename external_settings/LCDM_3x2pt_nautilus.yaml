@@ -30,7 +30,7 @@ params:
     proposal: 0.0001
     ref:
       dist: norm
-      loc: 0.0222
+      loc: 0.022445
       scale: 0.0001
   omch2:
     latex: '\Omega_\mathrm{c} h^2'
@@ -40,7 +40,7 @@ params:
     proposal: 0.0005
     ref:
       dist: norm
-      loc: 0.12
+      loc: 0.1205579307
       scale: 0.001
   ns:
     latex: 'n_\mathrm{s}'
@@ -71,7 +71,7 @@ params:
     proposal: 0.001
     ref:
       dist: norm
-      loc: 3.05
+      loc: 3.05685
       scale: 0.1
 
   tau: 0.05
