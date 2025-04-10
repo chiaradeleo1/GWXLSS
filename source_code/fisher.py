@@ -43,7 +43,6 @@ class get_Fisher:
 
         self.Nbins   = {new_obs: self.observables[obs]['Nbins'] for new_obs,obs in zip(self.renamed_obs,self.observables)}
         self.maxbins = max(list(self.Nbins.values()))
-
         print('')
         print('Computing fiducial observables...')
         tini = time()
@@ -108,11 +107,12 @@ class get_Fisher:
 
         ells = self.fidobs['ells'].values
         Nell = {k: [0.]*len(ells) for k in self.fidobs.columns}  
+        errfac = {}
+        if 'G' in self.Nbins.keys() or 'L' in self.Nbins.keys():
+            ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins['G'])*3600*(180/np.pi)**2
 
-        ngalbin = (self.galaxy_specs['gal_per_arcmin']/self.Nbins['G'])*3600*(180/np.pi)**2
-
-        errfac = {'G': np.full(len(ells),1/ngalbin,dtype=float),
-                  'L': np.full(len(ells),self.galaxy_specs['sigma_eps']**2/(2*ngalbin),dtype=float)}
+            errfac = {'G': np.full(len(ells),1/ngalbin,dtype=float),
+                    'L': np.full(len(ells),self.galaxy_specs['sigma_eps']**2/(2*ngalbin),dtype=float)}
 
         if self.GW_specs != {}:
             ngwbin  = (int(self.GW_specs['N_gw'])/self.Nbins['WC'])
