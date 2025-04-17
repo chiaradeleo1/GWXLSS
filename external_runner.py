@@ -63,17 +63,20 @@ def likelihood_nautilus(param_dict):
 
     try:
         theory = get_obs(param_dict|fixed_params,distributions,data_Cls['ells'],settings).Cls
+        chi2 = []
+        for ind,ell in enumerate(data_Cls['ells']):
+            diffvec = theory.iloc[ind][all_cols].values-data_Cls.iloc[ind][all_cols].values
+            chi2.append(np.dot(diffvec,np.dot(invcovmat[str(ell)],diffvec)))
+
+        chi2_tot = sum(chi2)
+
     except:
-        print('Theory failed!')
-        print(param_dict)
-        sys.exit('Something is wrong')
+        #print('Theory failed!')
+        #print(param_dict)
+        #sys.exit('Something is wrong')
+        chi2_tot = 1.e5
 
-    chi2 = []
-    for ind,ell in enumerate(data_Cls['ells']):
-        diffvec = theory.iloc[ind][all_cols].values-data_Cls.iloc[ind][all_cols].values
-        chi2.append(np.dot(diffvec,np.dot(invcovmat[str(ell)],diffvec)))
-
-    loglike = -0.5*sum(chi2)
+    loglike = -0.5*chi2_tot
 
     return loglike
 
