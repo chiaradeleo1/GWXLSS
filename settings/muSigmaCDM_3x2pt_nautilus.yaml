@@ -1,18 +1,15 @@
-output: chains/LCDM_3x2pt+GW
-force: True
+output: chains/muSigmaCDM_3x2pt
+
 likelihood:
   LSS: 
     external: LSSlike
-    data_path: ./mock_data/new_LSS_GW_LCDM
+    data_path: ./mock_data/new_LSS_muSigmaCDM
     debug_mode: False
     settings:
       case: simple
       calculation: CAMB
       extra: 
       camb_path:
-      scale_cut:
-        method: ell_cut_like
-        value: 200
     use_noiseless_cls: False
 
 sampler:
@@ -28,12 +25,12 @@ params:
     latex: '\Omega_\mathrm{b} h^2'
     prior:
       dist: norm
-      loc: 0.022445
-      scale: 0.00038
+      loc: 0.0227
+      scale: 0.0038
     proposal: 0.0001
     ref:
       dist: norm
-      loc: 0.022445
+      loc: 0.0226
       scale: 0.0031
 
   omch2:
@@ -44,7 +41,7 @@ params:
     proposal: 0.0005
     ref:
       dist: norm
-      loc: 0.1205579307
+      loc: 0.1215
       scale: 0.0066
 
   ns:
@@ -55,7 +52,7 @@ params:
     proposal: 0.002
     ref:
       dist: norm
-      loc: 0.96
+      loc: 0.958
       scale: 0.011
 
   H0:
@@ -66,7 +63,7 @@ params:
     proposal: 0.5
     ref:
       dist: norm
-      loc: 67.0
+      loc: 67.2
       scale: 2.3
 
   logA:
@@ -78,8 +75,9 @@ params:
     proposal: 0.001
     ref:
       dist: norm
-      loc: 3.05685
+      loc: 3.051
       scale: 0.040
+
   As:
     latex: 'A_\mathrm{s}'
     value: 'lambda logA: 1e-10*np.exp(logA)'
@@ -89,11 +87,10 @@ params:
   omegab:
     latex: '\Omega_\mathrm{b}'
     derived: 'lambda ombh2, H0: ombh2 / (H0 / 100.0) ** 2'
-    
+
   omegam:
-    latex: '\Omega_\mathrm{m}'  
-    derived: 'lambda ombh2, omch2, mnu,H0: ombh2 / (H0 / 100.0) ** 2 + omch2 / (H0 / 100.0) ** 2 + (mnu/93.14) / (H0 / 100.0) ** 2 '  
-  
+    latex: '\Omega_\mathrm{m}'
+    derived: 'lambda ombh2, omch2, mnu,H0: ombh2 / (H0 / 100.0) ** 2 + omch2 / (H0 / 100.0) ** 2 + (mnu/93.14) / (H0 / 100.0) ** 2'
 
   a0:
     latex: 'a_0'
@@ -103,7 +100,7 @@ params:
     proposal: 0.00005
     ref:
       dist: norm
-      loc: -0.007589
+      loc: -0.00754
       scale: 0.00023
 
   a1:
@@ -114,7 +111,7 @@ params:
     proposal: 0.00005
     ref:
       dist: norm
-      loc: 0.002008
+      loc: 0.0016
       scale: 0.0010
 
   a2:
@@ -125,7 +122,7 @@ params:
     proposal: 0.00005
     ref:
       dist: norm
-      loc: -0.004127
+      loc: -0.0031
       scale: 0.0020
 
   a3:
@@ -136,7 +133,7 @@ params:
     proposal: 0.00005
     ref:
       dist: norm
-      loc: 0.002918
+      loc: 0.00211
       scale: 0.0016
 
   a4:
@@ -147,7 +144,7 @@ params:
     proposal: 0.00002
     ref:
       dist: norm
-      loc: -0.0006784
+      loc: -0.00048
       scale: 0.00040
 
   b0_poly:
@@ -158,7 +155,7 @@ params:
     proposal: 0.01
     ref:
       dist: norm
-      loc: 0.830703
+      loc: 0.8306
       scale: 0.0034
 
   b1_poly:
@@ -169,7 +166,7 @@ params:
     proposal: 0.002
     ref:
       dist: norm
-      loc: 1.190547
+      loc: 1.1896
       scale: 0.0082
 
   b2_poly:
@@ -180,7 +177,7 @@ params:
     proposal: 0.002
     ref:
       dist: norm
-      loc: -0.928357
+      loc: -0.9274
       scale: 0.0088
 
   b3_poly:
@@ -191,69 +188,35 @@ params:
     proposal: 0.002
     ref:
       dist: norm
-      loc: 0.423292
+      loc: 0.4230
       scale: 0.0027
-  b0_poly_GW:
-    latex: 'b_0^{GW}'
-    prior:
-      min: 0.8136
-      max: 0.8476
-    proposal: 0.01
+  mu0:
+    latex: '\mu_0'
+    prior: 
+      max: 0.845
+      min: 0.435
+    proposal: 0.001
     ref:
       dist: norm
-      loc: 0.830703
-      scale: 0.0034
-
-  b1_poly_GW:
-    latex: 'b_1^{GW}'
-    prior:
-      min: 1.1486
-      max: 1.2306
-    proposal: 0.002
+      loc: 0.64
+      scale: 0.1
+  sigma0:
+    latex: '\Sigma_0'
+    prior: 
+      max: 0.815
+      min: 0.405
+    proposal: 0.001
     ref:
       dist: norm
-      loc: 1.190547
-      scale: 0.0082
-
-  b2_poly_GW:
-    latex: 'b_2^{GW}'
-    prior:
-      min: -0.9714
-      max: -0.8834
-    proposal: 0.002
-    ref:
-      dist: norm
-      loc: -0.928357
-      scale: 0.0088
-
-  b3_poly_GW:
-    latex: 'b_3^{GW}'
-    prior:
-      min: 0.4095
-      max: 0.4365
-    proposal: 0.002
-    ref:
-      dist: norm
-      loc: 0.423292
-      scale: 0.0027
-  # b0_poly: 0.830703
-  # b1_poly: 1.190547
-  # b2_poly: -0.928357
-  # b3_poly: 0.423292
-  # b0_poly_GW: 0.830703
-  # b1_poly_GW: 1.190547
-  # b2_poly_GW: -0.928357
-  # b3_poly_GW: 0.423292
-  # a0: -0.007589
-  # a1: 0.002008
-  # a2: -0.004127
-  # a3: 0.002918
-  # a4: -0.0006784
+      loc: 0.61
+      scale: 0.1
+  b0_poly_GW: 0.830703
+  b1_poly_GW: 1.190547
+  b2_poly_GW: -0.928357
+  b3_poly_GW: 0.423292
   w: -1.
   wa: 0.
   mnu: 0.06
-  mu0: 0.
-  sigma0: 0.
   MG_flag: 1
   pure_MG_flag: 2
   musigma_par: 1
