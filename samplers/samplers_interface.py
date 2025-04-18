@@ -76,7 +76,7 @@ def nautilus_interface(info):
     derived_array = np.array([np.array(list(der)) for der in derived])
 
     params_dict = {par: info['params'][par]['latex'] for par in info['params'] if type(info['params'][par]) == dict} | {'chi2': '\chi^2'}
-    nautilus_dict = {'params': {par: info['params'][par] for par in info['params'] if type(info['params'][par]) == dict} | {'chi2': {'latex': '\chi^2'}}} | {'theory': info['theory']}
+    nautilus_dict = {'params': {par: info['params'][par] for par in info['params'] if type(info['params'][par]) == dict} | {'chi2': {'latex': '\chi^2'}}}
 
     if 'output' in info:
         with open(info['output']+'.params.yaml', 'w') as outfile:

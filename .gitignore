@@ -31,4 +31,8 @@ Fisher_*
 compare*
 *_fisher_*
 *.npy
+*.sh
+test_*
+*.out
+*.err
 Validation*

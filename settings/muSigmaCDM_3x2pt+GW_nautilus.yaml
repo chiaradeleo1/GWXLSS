@@ -1,9 +1,9 @@
-output: chains/LCDM_3x2pt+GW
+output: chains/muSigmaCDM_3x2pt+GW
 force: True
 likelihood:
   LSS: 
     external: LSSlike
-    data_path: ./mock_data/new_LSS_GW_LCDM
+    data_path: ./mock_data/new_LSS_GW_muSigmaCDM
     debug_mode: False
     settings:
       case: simple
@@ -236,6 +236,26 @@ params:
       dist: norm
       loc: 0.423292
       scale: 0.0027
+  mu0:
+    latex: '\mu_0'
+    prior: 
+      max: 0.845
+      min: 0.435
+    proposal: 0.001
+    ref:
+      dist: norm
+      loc: 0.64
+      scale: 0.1
+  sigma0:
+    latex: '\Sigma_0'
+    prior: 
+      max: 0.815
+      min: 0.405
+    proposal: 0.001
+    ref:
+      dist: norm
+      loc: 0.61
+      scale: 0.1
   # b0_poly: 0.830703
   # b1_poly: 1.190547
   # b2_poly: -0.928357
@@ -252,8 +272,6 @@ params:
   w: -1.
   wa: 0.
   mnu: 0.06
-  mu0: 0.
-  sigma0: 0.
   MG_flag: 1
   pure_MG_flag: 2
   musigma_par: 1
