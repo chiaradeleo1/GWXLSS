@@ -16,9 +16,9 @@ sampler:
   nautilus:
     num_threads: 1
     pool: 10
-    n_live: 4000
-    n_batch: 512
-    n_networks: 16
+    n_live: 200
+    n_batch: 16
+    n_networks: 2
 
 params:
   ombh2:
@@ -95,56 +95,56 @@ params:
   a0:
     latex: 'a_0'
     prior:
-      min: -0.00869
-      max: -0.00639
+      min: -0.00864
+      max: -0.0065
     proposal: 0.00005
     ref:
       dist: norm
-      loc: -0.00754
+      loc: -0.007589
       scale: 0.00023
 
   a1:
     latex: 'a_1'
     prior:
-      min: -0.0034
-      max: 0.0066
+      min: -0.0039
+      max: 0.008
     proposal: 0.00005
     ref:
       dist: norm
-      loc: 0.0016
+      loc: 0.002008
       scale: 0.0010
 
   a2:
     latex: 'a_2'
     prior:
-      min: -0.0131
-      max: 0.0049
+      min: -0.0156
+      max: 0.0073
     proposal: 0.00005
     ref:
       dist: norm
-      loc: -0.0031
+      loc: -0.004127
       scale: 0.0020
 
   a3:
     latex: 'a_3'
     prior:
-      min: 0.00116
-      max: 0.01011
+      min: -0.0056 
+      max: 0.01134
     proposal: 0.00005
     ref:
       dist: norm
-      loc: 0.00211
+      loc: 0.002918
       scale: 0.0016
 
   a4:
     latex: 'a_4'
     prior:
-      min: -0.00248
-      max: -0.00033
+      min: -0.00278
+      max: 0.00138
     proposal: 0.00002
     ref:
       dist: norm
-      loc: -0.00048
+      loc: -0.0006784
       scale: 0.00040
 
   b0_poly:

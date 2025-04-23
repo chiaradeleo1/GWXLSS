@@ -131,8 +131,8 @@ params:
   a3:
     latex: 'a_3'
     prior:
-      min: 0.01134
-      max: -0.0056
+      min: -0.0056 
+      max: 0.01134
     proposal: 0.00005
     ref:
       dist: norm
