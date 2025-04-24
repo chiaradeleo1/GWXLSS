@@ -2,7 +2,7 @@ output: chains/LCDM_3x2pt_nautilus
 
 data_path: ./mock_data/new_LSS_LCDM
 settings:
-  case: simple
+  case: ['density']
   calculation: CAMB
   extra: 
   camb_path: /home/Matteo/Codes/GW-MGCAMB

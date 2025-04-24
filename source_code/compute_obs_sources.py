@@ -23,12 +23,25 @@ class get_obs:
         #Reading used observables from source distribution
         #Checking that there is no weird stuff
         self.observables = observables
+        self.case = {'density': True,
+                    'redshift': False,
+                    'lensing': False,
+                    'velocity': False,
+                    'lsd': False,
+                    'evolve': False,
+                    'potential': False,
+                    'gradpotential': False,
+                    'ISW': False}
         self.params      = deepcopy(params)
         if 'logA' in self.params:
             self.params['As'] = np.exp(self.params.pop('logA'))*1.e-10
         
         self.extra_params = settings['extra']
-        self.case         = settings['case']
+
+        for i in range (0,len(settings['case'])):
+            if settings['case'][i] in self.case.keys():
+                self.case[settings['case'][i]] = True
+
         self.camb_path    = settings['camb_path']
         self.ells         = ells
         self.calculation  = settings['calculation']
@@ -46,6 +59,7 @@ class get_obs:
                 "Gravitational Waves Weak Lensing (GWWL), and Gravitational Waves Counts (GWC)".format(obs))
 
         self.feedback     = feedback
+        
         
 
         #MMmod: to be checked
@@ -98,7 +112,7 @@ class get_obs:
 
     def additional_cosmo_dict(self,cosmo_dict):
         sys.path.insert(0,self.camb_path)
-        
+        import camb
         self.k_max_extrap= 1000000.0
         self.k_min_extrap= 0.00001
         from   camb         import model
@@ -154,7 +168,7 @@ class get_obs:
             if flag in cosmo_pars:
                 cosmo_pars[flag] = int(cosmo_pars[flag])
         pars = camb.set_params(**cosmo_pars)
-        pars = self.set_camb_specs(pars,self.case)  #This sets the cases for CAMB (Limber & friends)
+        pars = self.set_camb_specs(pars)  #This sets the cases for CAMB (Limber & friends)
         pars.NonLinear = model.NonLinear_both
         use_obs     = []
         window_list = []
@@ -219,17 +233,22 @@ class get_obs:
     
 
 
-    def set_camb_specs(self,pars,case):#='simple'):
+    def set_camb_specs(self,pars):
 
 
         pars.Want_CMB = False
         pars.SourceTerms.limber_windows = True
         pars.SourceTerms.limber_phi_lmin = 2
         ##Galaxy counts source terms
-        pars.SourceTerms.counts_density = True
+        pars.SourceTerms.counts_density = self.case['density']
         pars.SourceTerms.counts_ISW = True
         pars.SourceTerms.counts_potential = True
-        pars.SourceTerms.counts_evolve = False
+        pars.SourceTerms.counts_evolve = self.case['evolve']
+        pars.SourceTerms.counts_redshift = self.case['redshift']
+        pars.SourceTerms.counts_lensing =  self.case['lensing']
+        pars.SourceTerms.counts_velocity = self.case['velocity']
+        pars.SourceTerms.counts_radial = self.case['velocity']
+        pars.SourceTerms.counts_timedelay = self.case['velocity']
         ##21cm source terms
         pars.SourceTerms.line_phot_dipole = False
         pars.SourceTerms.line_phot_quadrupole = False 
@@ -237,79 +256,23 @@ class get_obs:
         pars.SourceTerms.line_distortions = False
         pars.SourceTerms.use_21cm_mK = False
         ##GWCounts source terms
-        pars.SourceTerms.gwcounts_density=True
-        pars.SourceTerms.gwcounts_evolve=False
-        pars.SourceTerms.gwcounts_gradpotential = False
-        pars.SourceTerms.gwcounts_potential = False
-        pars.SourceTerms.gwcounts_ISW = False
-        pars.SourceTerms.gwcounts_timedelay=False
-        pars.SourceTerms.gwcounts_velocity=False
-        pars.SourceTerms.gwcounts_lsd = False
-        pars.SourceTerms.gwcounts_lensing = False
+        pars.SourceTerms.gw_density= self.case['density']
+        pars.SourceTerms.gw_evolve= self.case['evolve']
+        pars.SourceTerms.gw_gradpotential = self.case['gradpotential']
+        pars.SourceTerms.gw_potential = self.case['potential']
+        pars.SourceTerms.gw_ISW = self.case['ISW']
+        pars.SourceTerms.gw_timedelay= self.case['velocity']
+        pars.SourceTerms.gw_velocity= self.case['velocity']
+        pars.SourceTerms.gw_lsd = self.case['lsd']
+        pars.SourceTerms.gw_lensing = self.case['lensing']
         #GW-WL source terms
-        pars.SourceTerms.gwamp_lensing = True
-        pars.SourceTerms.gwamp_volume = False
-        pars.SourceTerms.gwamp_sw = False
-        pars.SourceTerms.gwamp_ISW = False
-        pars.SourceTerms.gwamp_velocity = False
-        pars.SourceTerms.gwamp_TD = False
+        pars.SourceTerms.gwlens_lensing = True
+        pars.SourceTerms.gwlens_volume = False
+        pars.SourceTerms.gwlens_sw = False
+        pars.SourceTerms.gwlens_ISW = False
+        pars.SourceTerms.gwlens_velocity = False
+        pars.SourceTerms.gwlens_TD = False
         
-
-        if case == 'simple':
-            #GC
-            pars.SourceTerms.counts_redshift = False
-            pars.SourceTerms.counts_lensing = False
-            pars.SourceTerms.counts_velocity = False
-            pars.SourceTerms.counts_radial = False
-            pars.SourceTerms.counts_timedelay = False
-            
-            
-        elif case == 'total':
-            #GC
-            pars.SourceTerms.counts_redshift = True
-            pars.SourceTerms.counts_lensing = True
-            pars.SourceTerms.counts_velocity = True
-            pars.SourceTerms.counts_radial = True
-            pars.SourceTerms.counts_timedelay = True
-
-            
-        elif case == 'density':
-            #GC
-            pars.SourceTerms.counts_density = False
-            pars.SourceTerms.counts_redshift = True
-            pars.SourceTerms.counts_lensing = True
-            pars.SourceTerms.counts_velocity = True
-            pars.SourceTerms.counts_radial = True
-            pars.SourceTerms.counts_timedelay = True
-            
-        elif case == 'redshift':
-            #GC
-            pars.SourceTerms.counts_redshift = False
-            pars.SourceTerms.counts_lensing = True
-            pars.SourceTerms.counts_velocity = True
-            pars.SourceTerms.counts_radial = True
-            pars.SourceTerms.counts_timedelay = True
-            
-
-        elif case == 'lensing':
-            #GC
-            pars.SourceTerms.counts_redshift = True
-            pars.SourceTerms.counts_lensing = False
-            pars.SourceTerms.counts_velocity = True
-            pars.SourceTerms.counts_radial = True
-            pars.SourceTerms.counts_timedelay = True
-
-        elif case == 'velocity':
-            
-            pars.SourceTerms.counts_density = True
-            pars.SourceTerms.counts_redshift = True
-            pars.SourceTerms.counts_lensing = True
-            pars.SourceTerms.counts_velocity = False
-            pars.SourceTerms.counts_radial = False
-            pars.SourceTerms.counts_timedelay = False
-            
-        else:
-            sys.exit('UNKNOWN CAMB CASE {}'.format(case))
 
         return pars
 

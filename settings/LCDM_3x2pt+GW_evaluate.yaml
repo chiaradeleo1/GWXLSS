@@ -5,7 +5,7 @@ likelihood:
     data_path: ./mock_data/new_LSS_GW_ellcut_LCDM
     debug_mode: False
     settings:
-      case: simple
+      case: ['density']
       calculation: CAMB
       extra: 
       camb_path: /home/Matteo/Codes/GW-MGCAMB

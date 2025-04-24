@@ -38,7 +38,7 @@ sidelegend = {'bbox_to_anchor': (1.04,0.5),
 
 class MakeMock:
 
-    def __init__(self,gwspecs,observables,camb_path,fiducial,test_parameter,generate_mock=True):
+    def __init__(self,gwspecs,case,observables,camb_path,fiducial,test_parameter,generate_mock=True):
 
         self.Nbins_gw    = gwspecs['Nbins_GW']
         self.observables = observables
@@ -49,7 +49,7 @@ class MakeMock:
                     'sigma_eps': 0.3}
 
         info = {'obs_settings': {'extra': None,
-                                 'case': 'simple',
+                                 'case': case,
                                  'camb_path': camb_path,
                                  'calculation': 'CAMB'},
 

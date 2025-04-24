@@ -2,7 +2,7 @@ aliases: [LSS]
 speed: 500
 
 settings:
-  case: simple
+  case: ['density']
   calculation: CAMB
   extra: 
   camb_path: 

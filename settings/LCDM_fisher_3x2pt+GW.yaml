@@ -4,7 +4,7 @@ obs_settings:
   #These to be changed to change theory code or add relativistic effect
   #MM: expand
   extra:
-  case: simple
+  case: 
   camb_path: /home/matteo/Codes/GW-MGCAMB
   calculation: CAMB
 
