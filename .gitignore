@@ -26,7 +26,7 @@ Lisa_cl_plotting.ipynb
 test_fisher_and_likelihood.ipynb
 *.log
 testing_GW*
-Fisher_*
+Fisher_for*
 *matrix*
 compare*
 *_fisher_*
