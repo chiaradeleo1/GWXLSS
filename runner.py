@@ -41,7 +41,10 @@ if 'output' in info:
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-if list(info['sampler'].keys())[0] in ['mcmc','evaluate']:
+if list(info['sampler'].keys())[0] == 'mcmc':
+    updated_info,sampler = run(info)
+elif list(info['sampler'].keys())[0] == 'evaluate':
+    info['sampler'] = {'evaluate': {'override': {k: v["ref"]["loc"] for k,v in info['params'].items() if isinstance(v, dict) and "ref" in v and "loc" in v["ref"]}}}
     updated_info,sampler = run(info)
 elif list(info['sampler'].keys())[0] == 'nautilus':
     nautilus = nautilus_interface(info)

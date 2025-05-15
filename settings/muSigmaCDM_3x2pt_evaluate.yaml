@@ -1,27 +1,18 @@
-output: chains/muSigmaCDM_3x2pt+GW
-force: True
+debug: False
 likelihood:
   LSS: 
     external: LSSlike
-    data_path: ./mock_data/new_LSS_GW_muSigmaCDM
+    data_path: ./mock_data/new_LSS_muSigmaCDM
     debug_mode: False
     settings:
       case: simple
       calculation: CAMB
       extra: 
-      camb_path:
-      scale_cut:
-        method: ell_cut_like
-        value: 200
-    use_noiseless_cls: False
+      camb_path: /home/Matteo/Codes/GW-MGCAMB
+    use_noiseless_cls: True
 
 sampler:
-  nautilus:
-    num_threads: 1
-    pool: 10
-    n_live: 4000
-    n_batch: 512
-    n_networks: 16
+  evaluate: 
 
 params:
   ombh2:
@@ -180,47 +171,7 @@ params:
     prior:
       min: 0.4065
       max: 0.4401
-  
-  b0_poly_GW:
-    latex: 'b_0^{\rm GW}'
-    ref:
-      dist: norm
-      loc: 0.830703
-      scale: 0.0034
-    prior:
-      min: 0.8107
-      max: 0.8507
 
-  b1_poly_GW:
-    latex: 'b_1^{\rm GW}'
-    ref:
-      dist: norm
-      loc: 1.190547
-      scale: 0.0082
-    prior:
-      min: 1.1413
-      max: 1.2397
-
-  b2_poly_GW:
-    latex: 'b_2^{\rm GW}'
-    ref:
-      dist: norm
-      loc: -0.928357
-      scale: 0.0089
-    prior:
-      min: -0.9827
-      max: -0.8740
-
-  b3_poly_GW:
-    latex: 'b_3^{\rm GW}'
-    ref:
-      dist: norm
-      loc: 0.423292
-      scale: 0.0028
-    prior:
-      min: 0.4065
-      max: 0.4401
-  
   mu0:
     latex: '\mu_0'
     ref:
@@ -240,7 +191,11 @@ params:
     prior:
       min: 0.5
       max: 0.72
-      
+
+  b0_poly_GW: 0.830703
+  b1_poly_GW: 1.190547
+  b2_poly_GW: -0.928357
+  b3_poly_GW: 0.423292
   w: -1.
   wa: 0.
   mnu: 0.06

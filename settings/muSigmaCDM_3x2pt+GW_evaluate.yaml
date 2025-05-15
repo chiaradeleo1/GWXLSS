@@ -1,27 +1,18 @@
-output: chains/muSigmaCDM_3x2pt+GW
-force: True
+debug: False
 likelihood:
   LSS: 
     external: LSSlike
-    data_path: ./mock_data/new_LSS_GW_muSigmaCDM
+    data_path: ./mock_data/new_LSS_muSigmaCDM
     debug_mode: False
     settings:
       case: simple
       calculation: CAMB
       extra: 
-      camb_path:
-      scale_cut:
-        method: ell_cut_like
-        value: 200
-    use_noiseless_cls: False
+      camb_path: /home/Matteo/Codes/GW-MGCAMB
+    use_noiseless_cls: True
 
 sampler:
-  nautilus:
-    num_threads: 1
-    pool: 10
-    n_live: 4000
-    n_batch: 512
-    n_networks: 16
+  evaluate: 
 
 params:
   ombh2:
@@ -180,7 +171,7 @@ params:
     prior:
       min: 0.4065
       max: 0.4401
-  
+
   b0_poly_GW:
     latex: 'b_0^{\rm GW}'
     ref:
@@ -220,7 +211,7 @@ params:
     prior:
       min: 0.4065
       max: 0.4401
-  
+
   mu0:
     latex: '\mu_0'
     ref:
@@ -240,7 +231,7 @@ params:
     prior:
       min: 0.5
       max: 0.72
-      
+
   w: -1.
   wa: 0.
   mnu: 0.06
