@@ -23,10 +23,11 @@ class get_obs:
         #Reading used observables from source distribution
         #Checking that there is no weird stuff
         self.observables = observables
-        self.case = {'density': True,
+        self.case = {'density': False,
                     'redshift': False,
                     'lensing': False,
                     'velocity': False,
+                    'potential':False,
                     'lsd': False,
                     'evolve': False,
                     'potential': False,
@@ -241,8 +242,8 @@ class get_obs:
         pars.SourceTerms.limber_phi_lmin = 2
         ##Galaxy counts source terms
         pars.SourceTerms.counts_density = self.case['density']
-        pars.SourceTerms.counts_ISW = True
-        pars.SourceTerms.counts_potential = True
+        pars.SourceTerms.counts_ISW = self.case['ISW']
+        pars.SourceTerms.counts_potential = self.case['potential']
         pars.SourceTerms.counts_evolve = self.case['evolve']
         pars.SourceTerms.counts_redshift = self.case['redshift']
         pars.SourceTerms.counts_lensing =  self.case['lensing']
