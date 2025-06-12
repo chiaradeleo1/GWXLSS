@@ -11,7 +11,7 @@ test_fisher_and_likelihood.ipynb
 *.txt
 chains/*
 chains_MG/*
-mock_data/*
+mock_data*
 *.covmat
 */.ipynb*
 plot/*
@@ -36,3 +36,4 @@ test_*
 *.out
 *.err
 Validation*
+chains*

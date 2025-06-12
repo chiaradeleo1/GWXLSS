@@ -169,7 +169,7 @@ class get_obs:
             if flag in cosmo_pars:
                 cosmo_pars[flag] = int(cosmo_pars[flag])
         pars = camb.set_params(**cosmo_pars)
-        pars = self.set_camb_specs(pars)  #This sets the cases for CAMB (Limber & friends)
+        pars = self.set_camb_specs(pars) #This sets the cases for CAMB (Limber & friends)
         pars.NonLinear = model.NonLinear_both
         use_obs     = []
         window_list = []
@@ -241,15 +241,16 @@ class get_obs:
         pars.SourceTerms.limber_windows = True
         pars.SourceTerms.limber_phi_lmin = 2
         ##Galaxy counts source terms
-        pars.SourceTerms.counts_density = self.case['density']
-        pars.SourceTerms.counts_ISW = self.case['ISW']
-        pars.SourceTerms.counts_potential = self.case['potential']
-        pars.SourceTerms.counts_evolve = self.case['evolve']
-        pars.SourceTerms.counts_redshift = self.case['redshift']
-        pars.SourceTerms.counts_lensing =  self.case['lensing']
-        pars.SourceTerms.counts_velocity = self.case['velocity']
-        pars.SourceTerms.counts_radial = self.case['velocity']
-        pars.SourceTerms.counts_timedelay = self.case['velocity']
+        if 'GC' in self.observables:
+            pars.SourceTerms.counts_density = self.case['density']
+            pars.SourceTerms.counts_ISW = self.case['ISW']
+            pars.SourceTerms.counts_potential = self.case['potential']
+            pars.SourceTerms.counts_evolve = self.case['evolve']
+            pars.SourceTerms.counts_redshift = self.case['redshift']
+            pars.SourceTerms.counts_lensing =  self.case['lensing']
+            pars.SourceTerms.counts_velocity = self.case['velocity']
+            pars.SourceTerms.counts_radial = self.case['velocity']
+            pars.SourceTerms.counts_timedelay = self.case['velocity']
         ##21cm source terms
         pars.SourceTerms.line_phot_dipole = False
         pars.SourceTerms.line_phot_quadrupole = False 
@@ -257,22 +258,24 @@ class get_obs:
         pars.SourceTerms.line_distortions = False
         pars.SourceTerms.use_21cm_mK = False
         ##GWCounts source terms
-        pars.SourceTerms.gw_density= self.case['density']
-        pars.SourceTerms.gw_evolve= self.case['evolve']
-        pars.SourceTerms.gw_gradpotential = self.case['gradpotential']
-        pars.SourceTerms.gw_potential = self.case['potential']
-        pars.SourceTerms.gw_ISW = self.case['ISW']
-        pars.SourceTerms.gw_timedelay= self.case['velocity']
-        pars.SourceTerms.gw_velocity= self.case['velocity']
-        pars.SourceTerms.gw_lsd = self.case['lsd']
-        pars.SourceTerms.gw_lensing = self.case['lensing']
+        if 'GWC' in self.observables:
+            pars.SourceTerms.gwcounts_density= self.case['density']
+            pars.SourceTerms.gwcounts_evolve= self.case['evolve']
+            pars.SourceTerms.gwcounts_gradpotential = self.case['gradpotential']
+            pars.SourceTerms.gwcounts_potential = self.case['potential']
+            pars.SourceTerms.gwcounts_ISW = self.case['ISW']
+            pars.SourceTerms.gwcounts_timedelay= self.case['velocity']
+            pars.SourceTerms.gwcounts_velocity= self.case['velocity']
+            pars.SourceTerms.gwcounts_lsd = self.case['lsd']
+            pars.SourceTerms.gwcounts_lensing = self.case['lensing']
         #GW-WL source terms
-        pars.SourceTerms.gwlens_lensing = True
-        pars.SourceTerms.gwlens_volume = False
-        pars.SourceTerms.gwlens_sw = False
-        pars.SourceTerms.gwlens_ISW = False
-        pars.SourceTerms.gwlens_velocity = False
-        pars.SourceTerms.gwlens_TD = False
+        if 'GWWL' in self.observables:
+            pars.SourceTerms.gwlens_lensing = True
+            pars.SourceTerms.gwlens_volume = False
+            pars.SourceTerms.gwlens_sw = False
+            pars.SourceTerms.gwlens_ISW = False
+            pars.SourceTerms.gwlens_velocity = False
+            pars.SourceTerms.gwlens_TD = False
         
 
         return pars
