@@ -2,6 +2,7 @@ import re
 import numpy  as np
 import sys
 import pandas as pd
+import re
 from astropy import constants as const
 
 from cobaya.likelihood import Likelihood
@@ -44,11 +45,12 @@ class LSSlike(Likelihood):
 
                 self.covmat[ell_str] = cov_df 
             elif 'GC' or 'WL' not in self.observables.keys():
-                cols_to_drop = [col for col in cov_df.columns if 'G' in col or 'L' in col]
-                rows_to_drop = [idx for idx in cov_df.index   if 'G' in idx or 'L' in idx]
-
+                cols_to_drop = [col for col in cov_df.columns if col.startswith('L') or col.startswith('G') or 'xL' in col or 'xG' in col]
+                rows_to_drop = [idx for idx in cov_df.index if idx.startswith('L') or idx.startswith('G') or 'xL' in idx or 'xG' in idx]
+                
                 cov_df = cov_df.drop(columns=cols_to_drop, errors='ignore')
                 cov_df = cov_df.drop(index=rows_to_drop, errors='ignore')
+                
                 self.data_Cls = self.data_Cls.drop(columns=cols_to_drop, errors='ignore')
                 self.data_Cls = self.data_Cls.drop(index=rows_to_drop, errors='ignore')
 
