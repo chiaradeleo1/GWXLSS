@@ -2,7 +2,8 @@ debug: False
 likelihood:
   LSS: 
     external: LSSlike
-    data_path: ./mock_data/new_LSS_muSigmaCDM
+    data_path: ./mock_data/new_LSS_GW_LCDM
+    dist_path: ./mock_data/new_LSS_LCDM
     debug_mode: False
     settings:
       case: simple
@@ -176,21 +177,21 @@ params:
     latex: '\mu_0'
     ref:
       dist: norm
-      loc: 0.64
+      loc: 0.
       scale: 0.048
     prior:
-      min: 0.4
-      max: 0.88
+      min: -0.4
+      max: 0.4
 
   sigma0:
     latex: '\Sigma_0'
     ref:
       dist: norm
-      loc: 0.61
+      loc: 0.
       scale: 0.022
     prior:
-      min: 0.5
-      max: 0.72
+      min: -0.36
+      max: 0.24
 
   b0_poly_GW: 0.830703
   b1_poly_GW: 1.190547

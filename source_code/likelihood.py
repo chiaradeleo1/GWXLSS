@@ -27,10 +27,34 @@ class LSSlike(Likelihood):
             self.data_Cls     = pd.read_csv(self.data_path+'_Cls_noisy.dat',sep='\s+',header=0)
 
         self.data_ells    = self.data_Cls['ells']
-                        
         self.covmat      = np.load(self.data_path+'_covmat.npy',allow_pickle=True).item()
-        self.observables = np.load(self.data_path+'_source_distribution.npy',allow_pickle=True).item()
+        self.observables = np.load(self.dist_path+'_source_distribution.npy',allow_pickle=True).item()
         
+        for ell in self.data_ells:
+            ell_str = str(int(ell)) 
+            cov_df = self.covmat[ell_str]
+            if not any('GW' in key for key in self.observables.keys()):
+                cols_to_drop = [col for col in cov_df.columns if 'WC' in col or 'WL' in col]
+                rows_to_drop = [idx for idx in cov_df.index   if 'WC' in idx or 'WL' in idx]
+
+                cov_df = cov_df.drop(columns=cols_to_drop, errors='ignore')
+                cov_df = cov_df.drop(index=rows_to_drop, errors='ignore')
+                self.data_Cls = self.data_Cls.drop(columns=cols_to_drop, errors='ignore')
+                self.data_Cls = self.data_Cls.drop(index=rows_to_drop, errors='ignore')
+
+                self.covmat[ell_str] = cov_df 
+            elif 'GC' or 'WL' not in self.observables.keys():
+                cols_to_drop = [col for col in cov_df.columns if 'G' in col or 'L' in col]
+                rows_to_drop = [idx for idx in cov_df.index   if 'G' in idx or 'L' in idx]
+
+                cov_df = cov_df.drop(columns=cols_to_drop, errors='ignore')
+                cov_df = cov_df.drop(index=rows_to_drop, errors='ignore')
+                self.data_Cls = self.data_Cls.drop(columns=cols_to_drop, errors='ignore')
+                self.data_Cls = self.data_Cls.drop(index=rows_to_drop, errors='ignore')
+
+                self.covmat[ell_str] = cov_df
+
+
         tini = time()
         #inversion of covmat
         self.invcov = {key: np.linalg.pinv(cov) for key,cov in self.covmat.items()}
@@ -47,7 +71,6 @@ class LSSlike(Likelihood):
         like_cols = [col for col in self.data_Cls.columns if col != 'ells']
         ell_diff = []
         chi2_per_ell = []
-
         gw_cols = [col for col in like_cols if 'WC' in col or 'WL' in col]
         
        

@@ -46,6 +46,7 @@ params:
 k_max_extrap: 1000000.0
 k_min_extrap: 0.00001
 data_path: 
+dist_path:
 use_noiseless_cls: True
 debug_mode: False
 

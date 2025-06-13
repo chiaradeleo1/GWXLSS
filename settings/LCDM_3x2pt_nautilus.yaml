@@ -1,9 +1,10 @@
-output: chains/LCDM_3x2pt_noisy
-
+output: chains/LCDM_3x2pt_noisy_test
+force: True
 likelihood:
   LSS: 
     external: LSSlike
-    data_path: ./mock_data/new_LSS_LCDM
+    data_path: ./mock_data/new_LSS_GW_LCDM
+    dist_path: ./mock_data/new_LSS_LCDM
     debug_mode: False
     settings:
       case: simple
