@@ -59,8 +59,7 @@ class get_obs:
         else:
             sys.exit('Unknown calulation: {}'.format(obs))
         tend = time()
-    
-        if feedback:
+        if self.feedback:
             print('Cls computed in {:.1f} s'.format(tend - tini))
 
 
@@ -180,6 +179,7 @@ class get_obs:
                                        for i in range(1, Nbins_WL+1)]
 
             use_obs.append('WL')
+            
 
         if 'GWC' in self.observables:
             Nbins_GW  = self.observables['GWC']['Nbins']
@@ -199,17 +199,17 @@ class get_obs:
 
             use_obs.append('GWWL')
 
-        
         pars.SourceWindows = window_list
-        
         tini = time()
         results = camb.get_results(pars)
 
         cls = results.get_source_cls_dict(lmax=max(self.ells), raw_cl=True)
+
         if self.feedback:
             print('CAMB took {:.2f} s'.format(time()-tini))
 
         return cls
+   
 
 
 
@@ -227,8 +227,8 @@ class get_obs:
         pars.SourceTerms.limber_phi_lmin = 2
         ##Galaxy counts source terms
         pars.SourceTerms.counts_density = True
-        pars.SourceTerms.counts_ISW = True
-        pars.SourceTerms.counts_potential = True
+        pars.SourceTerms.counts_ISW = False
+        pars.SourceTerms.counts_potential = False
         pars.SourceTerms.counts_evolve = False
         ##21cm source terms
         pars.SourceTerms.line_phot_dipole = False
@@ -324,7 +324,7 @@ class get_obs:
     def get_cls(self,ells):
         
         cosmo=self.get_cosmo_dict(self.params)
-        cls=self.get_source_Cls(cosmo)
+        cls =self.get_source_Cls(cosmo)
         use_obs     = []
         #window_list = []
         Nbin={}

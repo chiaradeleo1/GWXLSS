@@ -40,6 +40,7 @@ class MakeMock:
 
     def __init__(self,gwspecs,observables,camb_path,fiducial,test_parameter,generate_mock=True):
 
+        self.Nbins_gal   = 10
         self.Nbins_gw    = gwspecs['Nbins_GW']
         self.observables = observables
         self.fiducial    = fiducial
@@ -72,6 +73,7 @@ class MakeMock:
             self.fiducial_obs  = self.get_fiducial(info)
             self.covmats       = self.get_covmats()
             self.mock_data     = self.create_mock()
+             
 
     def create_mock(self):
 
@@ -85,10 +87,11 @@ class MakeMock:
         theoryvec['ells'] = self.fiducial_obs['ells']
         datavec['ells']   = self.fiducial_obs['ells']
         covmat_dict = {str(int(ell)): self.covmats[ellind] for ellind,ell in enumerate(self.fiducial_obs['ells'])}
-
+        self.all_cols      = self.fishmodule.columns_ordering()  
         mock_dict = {'noiseless': theoryvec,
                      'noisy': datavec,
                      'covmat_dict': covmat_dict,
+                     'all_cols': self.all_cols,
                      'distributions': self.distributions}
 
         return mock_dict
@@ -142,7 +145,7 @@ class MakeMock:
         distributions = {}
 
         if 'GC' in self.observables:
-            dist = galaxy_distribution(survey='Euclid-10')
+            dist = galaxy_distribution('Euclid-{}'.format(self.Nbins_gal))
             bin_lims = dist.galdict['bin_lims']
             bin_mids = 0.5*(bin_lims[:-1]+bin_lims[1:])
             Nbins_gc = len(bin_lims)-1
@@ -152,7 +155,7 @@ class MakeMock:
                                    'zmean': bin_mids}
 
         if 'WL' in self.observables:
-            dist = galaxy_distribution(survey='Euclid-10')
+            dist = galaxy_distribution('Euclid-{}'.format(self.Nbins_gal))
             bin_lims = dist.galdict['bin_lims']
             bin_mids = 0.5*(bin_lims[:-1]+bin_lims[1:])
             Nbins_wl = len(bin_lims)-1

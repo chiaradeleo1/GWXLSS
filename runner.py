@@ -29,7 +29,7 @@ if list(info['sampler'].keys())[0] in ['mcmc','nautilus','evaluate']:
     likesets = deepcopy(info['likelihood']['LSS'])
     info['likelihood'] =  {'LSS': {'external': LSSlike,
                                    'data_path': likesets['data_path'],
-                                    'dist_path': likesets['dist_path'],
+                                    'obs_used': likesets['obs_used'],
                                    'debug_mode': likesets['debug_mode'],
                                    'settings': likesets['settings'],
                                    'use_noiseless_cls': likesets['use_noiseless_cls']}}

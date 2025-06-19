@@ -115,7 +115,10 @@ class get_Fisher:
                     'L': np.full(len(ells),self.galaxy_specs['sigma_eps']**2/(2*ngalbin),dtype=float)}
 
         if self.GW_specs != {}:
-            ngwbin  = (int(self.GW_specs['N_gw'])/self.Nbins['WC'])
+            if 'WC' in self.Nbins.keys():
+                ngwbin  = (int(self.GW_specs['N_gw'])/self.Nbins['WC'])
+            else:
+                ngwbin  = (int(self.GW_specs['N_gw'])/self.Nbins['WL'])
             errfac['WL'] = np.full(len(ells),(self.GW_specs['sigma_eps_gw']**2/ngwbin),dtype=float)
             errfac['WC'] = np.full(len(ells),(1/ngwbin),dtype=float)
 
