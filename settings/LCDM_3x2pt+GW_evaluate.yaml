@@ -2,14 +2,17 @@ debug: False
 likelihood:
   LSS: 
     external: LSSlike
-    data_path: ./mock_data/new_LSS_GW_LCDM
-    dist_path: ./mock_data/new_LSS_GW_LCDM
+    data_path: ./mock_data/new_LSS_GW_LCDM_mask
+    obs_used: ['GC', 'WL', 'GWC', 'GWWL']
     debug_mode: False
     settings:
       case: simple
       calculation: CAMB
       extra: 
-      camb_path: /home/Matteo/Codes/GW-MGCAMB
+      camb_path:
+      scale_cut:
+        method: ell_cut_like
+        value: 200
     use_noiseless_cls: True
 
 sampler:

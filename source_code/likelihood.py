@@ -34,9 +34,9 @@ class LSSlike(Likelihood):
 
         if not any('GW' in key for key in self.obs_used):
 
-            cov_df =self.covmat[str(int(self.data_ells[0]))].copy()
-            self.cols_to_drop = [col for col in cov_df.columns if 'WC' in col or 'WL' in col]
-            self.rows_to_drop = [idx for idx in cov_df.index   if 'WC' in idx or 'WL' in idx]
+            
+            self.cols_to_drop = [col for col in self.data_Cls.columns if 'W' in col]
+            self.rows_to_drop = self.cols_to_drop.copy()
 
             for ell in self.data_ells:
                 ell_str = str(int(ell)) 
@@ -46,13 +46,12 @@ class LSSlike(Likelihood):
                 cov_df = cov_df.drop(columns=self.cols_to_drop)
                 cov_df = cov_df.drop(index=self.rows_to_drop)
                 self.covmat[ell_str] = cov_df 
-        
             self.data_Cls = self.data_Cls.drop(columns=self.cols_to_drop)
 
         elif 'GC' or 'WL' not in self.obs_used:
-            cov_df =self.covmat[str(int(self.data_ells[0]))].copy()
-            self.cols_to_drop = [col for col in cov_df.columns if col.startswith('L') or col.startswith('G') or 'xL' in col or 'xG' in col]
-            self.rows_to_drop = [idx for idx in cov_df.index if idx.startswith('L') or idx.startswith('G') or 'xL' in idx or 'xG' in idx]
+            
+            self.cols_to_drop = [col for col in self.data_Cls.columns if col.startswith('L') or col.startswith('G') or 'xL' in col or 'xG' in col]
+            self.rows_to_drop = self.cols_to_drop.copy()
                 
             for ell in self.data_ells:
                 ell_str = str(int(ell)) 
@@ -64,6 +63,7 @@ class LSSlike(Likelihood):
                 self.covmat[ell_str] = cov_df
                 
             self.data_Cls = self.data_Cls.drop(columns=self.cols_to_drop)
+        
 
                 
 
@@ -79,8 +79,7 @@ class LSSlike(Likelihood):
     def logp(self, **params_values):
         params = {key: value for key, value in params_values.items()}
         theory = get_obs(params, self.observables, self.data_ells, self.settings).Cls
-        theory = theory.drop(columns=self.cols_to_drop)
-
+       
         loglike = 0
         like_cols = [col for col in self.data_Cls.columns if col != 'ells']
         ell_diff = []
