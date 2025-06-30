@@ -32,6 +32,7 @@ class get_obs:
         self.camb_path    = settings['camb_path']
         self.ells         = ells
         self.calculation  = settings['calculation']
+        self.obs_used    = settings['obs_used']
 
         self.zinterps        = np.logspace(-3,np.log10(5),500)
         self.k_max_Boltzmann = 10
@@ -328,14 +329,14 @@ class get_obs:
         use_obs     = []
         #window_list = []
         Nbin={}
-        if 'GC' in self.observables:
+        if 'GC' in self.obs_used:
             GCcols = ['G{}xG{}'.format(i,j) for i in range(1,self.observables['GC']['Nbins']+1) for j in range(i,self.observables['GC']['Nbins']+1)]
             use_obs.append('GC')
             Nbin['GC']=self.observables['GC']['Nbins'] #10
         else: 
             Nbin['GC']=0
 
-        if 'WL' in self.observables:
+        if 'WL' in self.obs_used:
             WLcols = ['L{}xL{}'.format(i,j) for i in range(1,self.observables['WL']['Nbins']+1) for j in range(i,self.observables['WL']['Nbins']+1)]
             use_obs.append('WL')
             Nbin['WL'] = Nbin['GC']+self.observables['WL']['Nbins'] #10+10 = 20
@@ -345,14 +346,14 @@ class get_obs:
             Nbin['IA'] = Nbin['WL']
 
 
-        if 'GWC' in self.observables:
+        if 'GWC' in self.obs_used:
             GWCcols = ['WC{}xWC{}'.format(i,j) for i in range(1,self.observables['GWC']['Nbins']+1) for j in range(i,self.observables['GWC']['Nbins']+1)]
             use_obs.append('GWC')
             Nbin['GWC']=Nbin['IA']+self.observables['GWC']['Nbins'] #10+10+10+10 = 40
         else:
             Nbin['GWC']=Nbin['IA']
 
-        if 'GWWL' in self.observables:
+        if 'GWWL' in self.obs_used:
             GWWLcols = ['WL{}xWL{}'.format(i,j) for i in range(1,self.observables['GWWL']['Nbins']+1) for j in range(i,self.observables['GWWL']['Nbins']+1)]
             use_obs.append('GWWL')
             Nbin['GWL']=Nbin['GWC']+self.observables['GWWL']['Nbins'] #10+10+10+10+10 = 50
@@ -361,42 +362,42 @@ class get_obs:
 
 
         
-        if 'WL' in self.observables and 'GC' in self.observables:
+        if 'WL' in self.obs_used and 'GC' in self.obs_used:
             GGLcols = ['G{}xL{}'.format(i,j) for i in range(1,self.observables['GC']['Nbins']+1) for j in range(1,self.observables['WL']['Nbins']+1)]
-        if 'WL' in self.observables and 'GWC' in self.observables:
+        if 'WL' in self.obs_used and 'GWC' in self.obs_used:
             LGWCcols = ['L{}xWC{}'.format(i,j) for i in range(1,self.observables['WL']['Nbins']+1) for j in range(1,self.observables['GWC']['Nbins']+1)]
-        if 'GC' in  self.observables and 'GWC' in  self.observables:
+        if 'GC' in  self.obs_used and 'GWC' in  self.obs_used:
             GGWCcols = ['G{}xWC{}'.format(i,j) for i in range(1,self.observables['GC']['Nbins']+1) for j in range(1,self.observables['GWC']['Nbins']+1)]
-        if 'GC' in  self.observables and 'GWWL' in  self.observables:
+        if 'GC' in  self.obs_used and 'GWWL' in  self.obs_used:
             GGWLcols = ['G{}xWL{}'.format(i,j) for i in range(1,self.observables['GC']['Nbins']+1) for j in range(1,self.observables['GWWL']['Nbins']+1)]
-        if 'WL' in self.observables and 'GWWL' in self.observables:
+        if 'WL' in self.obs_used and 'GWWL' in self.obs_used:
             LGWLcols = ['L{}xWL{}'.format(i,j) for i in range(1,self.observables['WL']['Nbins']+1) for j in range(1,self.observables['GWWL']['Nbins']+1)]
-        if 'GWC' in self.observables and 'GWWL' in self.observables:
+        if 'GWC' in self.obs_used and 'GWWL' in self.obs_used:
             GWCGWLcols = ['WC{}xWL{}'.format(i,j) for i in range(1,self.observables['GWC']['Nbins']+1) for j in range(1,self.observables['GWWL']['Nbins']+1)]
         
             
 
         all_cols=[]
-        if 'WL' in use_obs: 
+        if 'WL' in self.obs_used: 
                all_cols = all_cols+WLcols
         if 'GC' in use_obs:
-            if 'WL' in use_obs:
+            if 'WL' in self.obs_used:
                 all_cols = all_cols+GGLcols+GCcols
             else:
                 all_cols = all_cols+GCcols
-        if 'GWC' in use_obs:
+        if 'GWC' in self.obs_used:
             all_cols = all_cols+GWCcols
-            if 'GC' in use_obs:
+            if 'GC' in self.obs_used:
                 all_cols = all_cols+GGWCcols
-            if 'WL' in use_obs:
+            if 'WL' in self.obs_used:
                 all_cols = all_cols+LGWCcols
-        if 'GWWL' in use_obs:
+        if 'GWWL' in self.obs_used:
             all_cols = all_cols + GWWLcols
-            if 'GC' in use_obs:
+            if 'GC' in self.obs_used:
                 all_cols = all_cols+GGWLcols
-            if 'WL' in use_obs:
+            if 'WL' in self.obs_used:
                 all_cols = all_cols+LGWLcols
-            if 'GWC' in use_obs:
+            if 'GWC' in self.obs_used:
                 all_cols = all_cols+GWCGWLcols
 
 
@@ -408,7 +409,7 @@ class get_obs:
         final_Cls['ells'] = ells
         
         tini = time()
-        if 'GC' in use_obs:
+        if 'GC' in self.obs_used:
             #Cls GC x GC
 
             gc_interp_dict = {'G{}xG{}'.format(bin1,bin2): interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), 
@@ -422,7 +423,7 @@ class get_obs:
             
 
         
-        if 'WL' in use_obs:
+        if 'WL' in self.obs_used:
             #Cls gamma x gamma
             gamma_interp_dict = {'L{}xL{}'.format(bin1-Nbin['GC'], bin2-Nbin['GC']): interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), 
                                                                                               cls['W{}xW{}'.format(bin1, bin2)], kind='cubic')(ells)
@@ -453,7 +454,7 @@ class get_obs:
                 final_Cls[key]+=val
 
             
-        if 'GWC' in use_obs:
+        if 'GWC' in self.obs_used:
             #Cls GWC x GWC
             gwc_interp_dict = {'WC{}xWC{}'.format(bin1-(Nbin['IA']),bin2-(Nbin['IA'])): interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), 
                                                                                                  cls['W{}xW{}'.format(bin1, bin2)], kind='linear')(ells)
@@ -462,7 +463,7 @@ class get_obs:
             for key,val in gwc_interp_dict.items():
                 final_Cls[key] = val
 
-        if 'GWWL' in use_obs:
+        if 'GWWL' in self.obs_used:
             #Cls GWWL x GWWL
 
             gwl_interp_dict = {'WL{}xWL{}'.format(bin1-(Nbin['GWC']),bin2-(Nbin['GWC'])): interp1d(np.arange(0, len(cls['W{}xW{}'.format(bin1, bin2)])), 
@@ -472,7 +473,7 @@ class get_obs:
             for key,val in gwl_interp_dict.items():
                 final_Cls[key] = val
 
-        if 'WL' in use_obs and 'GC' in use_obs:
+        if 'WL' in self.obs_used and 'GC' in self.obs_used:
             #Cls gamma x GC
             gc_gamma_interp_dict = {}
             gamma_gc_interp_dict = {}
@@ -510,7 +511,7 @@ class get_obs:
             for key,val in IA_gc_interp_dict.items():
                 final_Cls[key]+= val
 
-        if 'WL' in use_obs and 'GWC' in use_obs:
+        if 'WL' in self.obs_used and 'GWC' in self.obs_used:
             #Cls gamma x GW
             gwc_gamma_interp_dict = {}
             gamma_gwc_interp_dict = {}
@@ -546,7 +547,7 @@ class get_obs:
             for key,val in IA_gwc_interp_dict.items():
                 final_Cls[key]+= val
 
-        if 'GWC' in use_obs and 'GC' in use_obs:
+        if 'GWC' in self.obs_used and 'GC' in self.obs_used:
             #Cls GWC x GC
             gc_gwc_interp_dict = {}
             gwc_gc_interp_dict = {}
@@ -567,7 +568,7 @@ class get_obs:
                 final_Cls[key]= val
         
 
-        if 'GWWL' in use_obs and 'GC' in use_obs:
+        if 'GWWL' in self.obs_used and 'GC' in self.obs_used:
             #Cls GWWL x GC
             gc_gwl_interp_dict = {}
             gwl_gc_interp_dict = {}
@@ -586,7 +587,7 @@ class get_obs:
                 final_Cls[key]= val
 
 
-        if 'WL' in use_obs and 'GWWL' in use_obs:
+        if 'WL' in self.obs_used and 'GWWL' in self.obs_used:
             #Cls gamma x GWWL
             gwl_gamma_interp_dict = {}
             gamma_gwl_interp_dict = {}
@@ -623,7 +624,7 @@ class get_obs:
                 final_Cls[key]+= val
 
         
-        if 'GWWL' in use_obs and 'GWC' in use_obs:
+        if 'GWWL' in self.obs_used and 'GWC' in self.obs_used:
             #Cls GWWL x GWC
             gwc_gwl_interp_dict = {}
             gwl_gwc_interp_dict = {}

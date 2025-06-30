@@ -30,7 +30,7 @@ class LSSlike(Likelihood):
         self.data_ells    = self.data_Cls['ells']
         self.covmat      = np.load(self.data_path+'_covmat.npy',allow_pickle=True).item()
         self.observables = np.load(self.data_path+'_source_distribution.npy',allow_pickle=True).item()
-        
+        self.obs_used = self.settings['obs_used']
 
         if not any('GW' in key for key in self.obs_used):
 

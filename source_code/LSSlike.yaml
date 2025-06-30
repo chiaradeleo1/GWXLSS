@@ -7,6 +7,7 @@ settings:
   extra: 
   camb_path: 
   scale_cut:
+  obs_used:
 
 
   
@@ -46,7 +47,6 @@ params:
 k_max_extrap: 1000000.0
 k_min_extrap: 0.00001
 data_path: 
-obs_used:
 use_noiseless_cls: True
 debug_mode: False
 
