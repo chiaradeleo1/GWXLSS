@@ -1,10 +1,10 @@
-output: chains/LCDM_3x2pt+GWC_fisher
+output: chains/LCDM_3x2pt_fisher
 force: True
 likelihood:
   LSS: 
     external: LSSlike
     data_path: ./mock_data/new_LSS_GW_LCDM
-    obs_used: ['GC', 'WL', 'GWC']
+    obs_used: ['GC', 'WL']
     debug_mode: False
     settings:
       case: simple
@@ -18,7 +18,7 @@ obs_settings:
   calculation: CAMB
   extra: 
   camb_path:
-  obs_used: ['GC', 'WL', 'GWC']
+  obs_used: ['GC', 'WL']
 
 analysis_settings:
   #These settings are needed by the Fisher matrix module to create 
@@ -29,7 +29,7 @@ analysis_settings:
   #- WL: galaxy weak lensing
   #- GWC: gravitational waves counts
   #- GWWL: gravitational waves lensing
-  observables: [GC,WL,GWC]
+  observables: [GC,WL]
   lmin: 10
   lmax: 1500
   Nbin_ell: 20
@@ -37,23 +37,17 @@ analysis_settings:
     fsky: 0.35
     gal_per_arcmin: 30.
     sigma_eps: 0.3
-  gw_specs:
-    N_gw: 1.0e+6
-    Nbins_GW: 6
-    sigma_eps_gw: 0.01
-    fsky: 0.35
-    #Option used to boost error after a given scale
-    scale_cut:
-      #Available methods: 
-      #- ell_cut: after the selected ell (value) multiplies the error by 1000
-      #- theta_min: multiplies the error by a beam factor with value as resolution (add EQ. here)
-      method: ell_cut
-      value: 200
+# sampler:
+#   nautilus:
+#     num_threads: 1
+#     pool: 10
+#     n_live: 4000
+#     n_batch: 512
+#     n_networks: 16
 
 sampler:
   Fisher:
-    #Available derivatives options: 2PT (faster) polynomial (more accurate)
-    derivative: 2PT
+    derivative: polynomial
     freepars:
       ombh2:
         fiducial: 0.022445
@@ -111,32 +105,18 @@ sampler:
         fiducial: 0.423292
         variation: 0.1
         latex: b_3
-      b0_poly_GW:
-        fiducial: 0.830703
-        variation: 0.1
-        latex: b_0^{GW}
-      b1_poly_GW:
-        fiducial: 1.190547
-        variation: 0.1
-        latex: b_1^{GW}
-      b2_poly_GW:
-        fiducial: -0.928357
-        variation: 0.1
-        latex: b_2^{GW}
-      b3_poly_GW: 
-        fiducial: 0.423292
-        variation: 0.1
-        latex: b_3^{GW}
-
 
     fixedpars:
       tau: 0.05
       w: -1.
       wa: 0.
       mnu: 0.06
-      #MG params
       mu0: 0.
       sigma0: 0.
+      b0_poly_GW: 0.830703
+      b1_poly_GW: 1.190547
+      b2_poly_GW: -0.928357
+      b3_poly_GW: 0.423292
       MG_flag: 1
       pure_MG_flag: 2
       musigma_par: 1
