@@ -4,6 +4,8 @@ import sys
 import pandas as pd
 import re
 from astropy import constants as const
+import os
+
 
 from cobaya.likelihood import Likelihood
 
@@ -13,7 +15,6 @@ from source_code.compute_obs_sources import get_obs
 
 from time import time
 
-
 class LSSlike(Likelihood):
 
     def initialize(self):
@@ -21,8 +22,8 @@ class LSSlike(Likelihood):
         #Hard coded stuff
         
         self.feedback=self.debug_mode
-  
         if self.use_noiseless_cls:
+            print('Using noiseless Cls')
             self.data_Cls     = pd.read_csv(self.data_path+'_Cls_noiseless.dat',sep='\s+',header=0)
         else:
             self.data_Cls     = pd.read_csv(self.data_path+'_Cls_noisy.dat',sep='\s+',header=0)
@@ -31,76 +32,64 @@ class LSSlike(Likelihood):
         self.covmat      = np.load(self.data_path+'_covmat.npy',allow_pickle=True).item()
         self.observables = np.load(self.data_path+'_source_distribution.npy',allow_pickle=True).item()
         self.obs_used = self.settings['obs_used']
+        print('Observables used:', self.obs_used)
+        cov_cut = {}
+        invcov = {}
+        for ell in self.data_ells:
+            ell_str = str(int(ell))
+            cov_df = self.covmat[ell_str]
+            self.cols_to_drop = []
+            if 'GWC' not in self.obs_used or ell>self.settings['scale_cut']['value']:   
+                #print('Dropping GWC')
+                self.cols_to_drop = [col for col in cov_df.columns if 'WC' in col]
+            if 'GWWL' not in self.obs_used or ell>self.settings['scale_cut']['value']:   
+                #print('Dropping GWWL')
+                self.cols_to_drop += [col for col in cov_df.columns if 'WL' in col]
+            if 'GC' not in self.obs_used:
+                #print('Dropping GC')
+                self.cols_to_drop += [col for col in cov_df.columns if col.split('x')[0].startswith('G') or col.split('x')[1].startswith('G')]
+            if 'WL' not in self.obs_used:
+                #print('Dropping WL')
+                self.cols_to_drop += [col for col in cov_df.columns if col.split('x')[0].startswith('L') or col.split('x')[1].startswith('L')]
 
-        if not any('GW' in key for key in self.obs_used):
+            cov_df = cov_df.drop(columns=self.cols_to_drop)
+            cov_df = cov_df.drop(index=self.cols_to_drop)
+            cov_cut[ell_str] = cov_df
+            invcov[ell_str] = pd.DataFrame(np.linalg.pinv(cov_df), index=cov_df.index, columns=cov_df.columns)
 
+        self.invcov = invcov    
             
-            self.cols_to_drop = [col for col in self.data_Cls.columns if 'W' in col]
-            self.rows_to_drop = self.cols_to_drop.copy()
-
-            for ell in self.data_ells:
-                ell_str = str(int(ell)) 
-                cov_df = self.covmat[ell_str]
-                
-
-                cov_df = cov_df.drop(columns=self.cols_to_drop)
-                cov_df = cov_df.drop(index=self.rows_to_drop)
-                self.covmat[ell_str] = cov_df 
-            self.data_Cls = self.data_Cls.drop(columns=self.cols_to_drop)
-
-        elif 'GC' or 'WL' not in self.obs_used:
-            
-            self.cols_to_drop = [col for col in self.data_Cls.columns if col.startswith('L') or col.startswith('G') or 'xL' in col or 'xG' in col]
-            self.rows_to_drop = self.cols_to_drop.copy()
-                
-            for ell in self.data_ells:
-                ell_str = str(int(ell)) 
-                cov_df = self.covmat[ell_str]
-
-                
-                cov_df = cov_df.drop(columns=self.cols_to_drop)
-                cov_df = cov_df.drop(index=self.rows_to_drop)
-                self.covmat[ell_str] = cov_df
-                
-            self.data_Cls = self.data_Cls.drop(columns=self.cols_to_drop)
-        
-
-                
-
-
-        tini = time()
-        #inversion of covmat
-        self.invcov = {key: np.linalg.pinv(cov) for key,cov in self.covmat.items()}
-        print('Covmats inverted in {:.3f}'.format(time()-tini))
-
-    
 
 
     def logp(self, **params_values):
         params = {key: value for key, value in params_values.items()}
+       
         theory = get_obs(params, self.observables, self.data_ells, self.settings).Cls
+        
+  
        
         loglike = 0
-        like_cols = [col for col in self.data_Cls.columns if col != 'ells']
+
         ell_diff = []
         chi2_per_ell = []
-        gw_cols = [col for col in like_cols if 'WC' in col or 'WL' in col]
-        
        
         for ind, ell in enumerate(self.data_ells):
+            like_cols = self.invcov[str(int(ell))].columns
+            gw_cols = [i for i, col in enumerate(like_cols) if 'W' in col]
 
-            thvec = theory.iloc[ind][like_cols].values.copy()
-            dtvec = self.data_Cls.iloc[ind][like_cols].values
-            if ('scale_cut' in self.settings and self.settings['scale_cut'].get('method') == 'ell_cut_like'):
-                if ell > self.settings['scale_cut']['value']:
-                    for i, col in enumerate(like_cols):
-                        if col in gw_cols:
-                            thvec[i] = dtvec[i]
+            if len(like_cols) > 0:
+                thvec = theory.iloc[ind][like_cols].values.copy()
+                dtvec = self.data_Cls.iloc[ind][like_cols].values
+                diffvec = thvec - dtvec
 
+                if ('scale_cut' in self.settings 
+                    and self.settings['scale_cut'].get('method') == 'ell_cut_like' 
+                    and ell > self.settings['scale_cut']['value']):
+                    
+                    diffvec[gw_cols] = 0.0
 
-            diffvec = thvec - dtvec
-            chi2_val = np.dot(diffvec, np.dot(self.invcov[str(int(ell))], diffvec))
-            loglike += -0.5 * chi2_val
+                chi2_val = np.dot(diffvec, np.dot(self.invcov[str(int(ell))], diffvec))
+                loglike += -0.5 * chi2_val
 
             if self.feedback:
                 diff_dict = {'ells': ell} | {col: thvec[i] - dtvec[i] for i, col in enumerate(like_cols)}

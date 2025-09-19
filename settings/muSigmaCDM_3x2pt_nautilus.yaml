@@ -26,8 +26,8 @@ params:
     latex: '\Omega_\mathrm{b} h^2'
     prior:
       dist: norm
-      loc: 0.0227
-      scale: 0.0038
+      loc: 0.224455
+      scale: 0.0031
     proposal: 0.0001
     ref:
       dist: norm

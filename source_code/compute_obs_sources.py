@@ -23,16 +23,19 @@ class get_obs:
         #Reading used observables from source distribution
         #Checking that there is no weird stuff
         self.observables = observables
+        
         self.params      = deepcopy(params)
         if 'logA' in self.params:
             self.params['As'] = np.exp(self.params.pop('logA'))*1.e-10
-        
+   
+                
         self.extra_params = settings['extra']
         self.case         = settings['case']
         self.camb_path    = settings['camb_path']
         self.ells         = ells
         self.calculation  = settings['calculation']
-        self.obs_used    = settings['obs_used']
+        self.obs_used    = ['GC','WL','GWC', 'GWWL' ]#settings['obs_used']
+        
 
         self.zinterps        = np.logspace(-3,np.log10(5),500)
         self.k_max_Boltzmann = 10
@@ -199,7 +202,6 @@ class get_obs:
                                    for i in range(1, Nbins_GW+1)]
 
             use_obs.append('GWWL')
-
         pars.SourceWindows = window_list
         tini = time()
         results = camb.get_results(pars)
@@ -419,7 +421,6 @@ class get_obs:
             for key,val in gc_interp_dict.items():
                 final_Cls[key] = val
 
-
             
 
         
@@ -462,6 +463,7 @@ class get_obs:
             
             for key,val in gwc_interp_dict.items():
                 final_Cls[key] = val
+                
 
         if 'GWWL' in self.obs_used:
             #Cls GWWL x GWWL
