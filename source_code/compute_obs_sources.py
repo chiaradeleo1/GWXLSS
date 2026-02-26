@@ -34,7 +34,7 @@ class get_obs:
         self.camb_path    = settings['camb_path']
         self.ells         = ells
         self.calculation  = settings['calculation']
-        self.obs_used    = ['GC','WL','GWC', 'GWWL' ]#settings['obs_used']
+        self.obs_used    = settings['obs_used']
         
 
         self.zinterps        = np.logspace(-3,np.log10(5),500)
