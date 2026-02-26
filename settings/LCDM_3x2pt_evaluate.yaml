@@ -6,7 +6,6 @@ likelihood:
     debug_mode: false
     settings:
       case: simple
-      calculation: CAMB
       extra: 
       obs_used: ['GC', 'WL']
       camb_path: /home/Matteo/Codes/GW-MGCAMB

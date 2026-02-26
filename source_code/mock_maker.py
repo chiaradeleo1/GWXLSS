@@ -50,8 +50,7 @@ class MakeMock:
         info = {'obs_settings': {'extra': None,
                                  'case': 'simple',
                                  'obs_used': self.observables,
-                                 'camb_path': camb_path,
-                                 'calculation': 'CAMB'},
+                                 'camb_path': camb_path},
 
                 'analysis_settings': {'lmin': 10,
                                       'lmax': 1500,

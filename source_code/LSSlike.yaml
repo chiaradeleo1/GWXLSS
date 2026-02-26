@@ -3,7 +3,6 @@ speed: 500
 
 settings:
   case: simple
-  calculation: CAMB
   extra: 
   camb_path: 
   scale_cut:

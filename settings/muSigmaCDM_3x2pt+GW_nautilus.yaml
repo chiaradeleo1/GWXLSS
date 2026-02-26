@@ -7,7 +7,6 @@ likelihood:
     debug_mode: False
     settings:
       case: simple
-      calculation: CAMB
       obs_used: ['GC', 'WL', 'GWC', 'GWWL']
       extra: 
       camb_path:

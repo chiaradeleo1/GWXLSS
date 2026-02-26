@@ -2,7 +2,7 @@ import numpy as np
 
 import warnings
 warnings.filterwarnings('ignore')
-
+#CDL: We thank Davide Sciotti for the contribution. This is part of the Spaceborne code (https://github.com/davidesciotti/Spaceborne_covg)
 def covariance_einsum(cl_5d, noise_5d, f_sky, ell_values, delta_ell, return_only_diagonal_ells=False):
     """
     computes the 10-dimensional covariance matrix, of shape

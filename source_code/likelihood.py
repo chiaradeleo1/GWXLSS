@@ -35,21 +35,20 @@ class LSSlike(Likelihood):
         print('Observables used:', self.obs_used)
         cov_cut = {}
         invcov = {}
+        '''CDL: First masking of the data. We generate a single dataset containing the full LSSxGW. Here we mask the data and the
+        corresponding covariance elements that we do not want to use. E.g. if we want to use just the LSS part we drop all the columns (and
+        rows in the covariance) that contain a GW observable: GWC, GWWL.'''
         for ell in self.data_ells:
             ell_str = str(int(ell))
             cov_df = self.covmat[ell_str]
             self.cols_to_drop = []
             if 'GWC' not in self.obs_used or ell>self.settings['scale_cut']['value']:   
-                #print('Dropping GWC')
                 self.cols_to_drop = [col for col in cov_df.columns if 'WC' in col]
             if 'GWWL' not in self.obs_used or ell>self.settings['scale_cut']['value']:   
-                #print('Dropping GWWL')
                 self.cols_to_drop += [col for col in cov_df.columns if 'WL' in col]
             if 'GC' not in self.obs_used:
-                #print('Dropping GC')
                 self.cols_to_drop += [col for col in cov_df.columns if col.split('x')[0].startswith('G') or col.split('x')[1].startswith('G')]
             if 'WL' not in self.obs_used:
-                #print('Dropping WL')
                 self.cols_to_drop += [col for col in cov_df.columns if col.split('x')[0].startswith('L') or col.split('x')[1].startswith('L')]
 
             cov_df = cov_df.drop(columns=self.cols_to_drop)
@@ -81,7 +80,10 @@ class LSSlike(Likelihood):
                 thvec = theory.iloc[ind][like_cols].values.copy()
                 dtvec = self.data_Cls.iloc[ind][like_cols].values
                 diffvec = thvec - dtvec
-
+                '''CDL: Second masking or scale cut. Our code now doesn't allow to work with different ell_max for the LSS and GW part.
+                Since the maximum multipole of LSS is expected to be higher then the one of GW, we generate the data for LSSxGW using the 
+                ell_max of LSS (in this work is 1500) and then we cut all the GWs term (both auto and cross) that are at multipole higher than a
+                value that can be chosen in the settings (in this work is 200).'''
                 if ('scale_cut' in self.settings 
                     and self.settings['scale_cut'].get('method') == 'ell_cut_like' 
                     and ell > self.settings['scale_cut']['value']):

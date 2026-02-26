@@ -6,7 +6,7 @@ obs_settings:
   extra:
   case: simple
   camb_path: /home/Matteo/Codes/GW-MGCAMB
-  calculation: CAMB
+  
 
 analysis_settings:
   #These settings are needed by the Fisher matrix module to create 

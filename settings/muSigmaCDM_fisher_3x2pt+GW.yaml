@@ -1,23 +1,12 @@
-output: chains/LCDM_3x2pt+GWC_fisher
-force: True
-likelihood:
-  LSS: 
-    external: LSSlike
-    data_path: ./mock_data/new_LSS_GW_LCDM
-    obs_used: ['GC', 'WL', 'GWC']
-    debug_mode: False
-    settings:
-      case: simple
-      extra: 
-      camb_path:
-    use_noiseless_cls: False
+output: chains/muSigmaCDM_fisher_3x2pt+GW
 
 obs_settings:
+  #These to be changed to change theory code or add relativistic effect
+  #MM: expand
+  extra:
   case: simple
+  camb_path: /home/matteo/Codes/GW-MGCAMB
   
-  extra: 
-  camb_path:
-  obs_used: ['GC', 'WL', 'GWC']
 
 analysis_settings:
   #These settings are needed by the Fisher matrix module to create 
@@ -28,7 +17,7 @@ analysis_settings:
   #- WL: galaxy weak lensing
   #- GWC: gravitational waves counts
   #- GWWL: gravitational waves lensing
-  observables: [GC,WL,GWC]
+  observables: [GC,WL,GWC,GWWL]
   lmin: 10
   lmax: 1500
   Nbin_ell: 20
@@ -113,20 +102,27 @@ sampler:
       b0_poly_GW:
         fiducial: 0.830703
         variation: 0.1
-        latex: b_0^{GW}
+        latex: b^{GW}_0
       b1_poly_GW:
         fiducial: 1.190547
         variation: 0.1
-        latex: b_1^{GW}
+        latex: b^{GW}_1
       b2_poly_GW:
         fiducial: -0.928357
         variation: 0.1
-        latex: b_2^{GW}
-      b3_poly_GW: 
+        latex: b^{GW}_2
+      b3_poly_GW:
         fiducial: 0.423292
         variation: 0.1
-        latex: b_3^{GW}
-
+        latex: b^{GW}_3
+      mu0:
+        fiducial: 0.
+        variation: 0.1
+        latex: \mu_0
+      sigma0:
+        fiducial: 0.
+        variation: 0.1
+        latex: \Sigma_0
 
     fixedpars:
       tau: 0.05
@@ -134,8 +130,6 @@ sampler:
       wa: 0.
       mnu: 0.06
       #MG params
-      mu0: 0.
-      sigma0: 0.
       MG_flag: 1
       pure_MG_flag: 2
       musigma_par: 1
