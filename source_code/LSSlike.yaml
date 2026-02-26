@@ -6,6 +6,9 @@ settings:
   calculation: CAMB
   extra: 
   camb_path: 
+  scale_cut:
+  obs_used:
+
 
   
 params:
@@ -13,6 +16,10 @@ params:
   b1_poly: 1.190547
   b2_poly: -0.928357
   b3_poly: 0.423292
+  b0_poly_GW: 0.830703
+  b1_poly_GW: 1.190547
+  b2_poly_GW: -0.928357
+  b3_poly_GW: 0.423292
   a0: -0.007589
   a1 :  0.002008
   a2 : -0.004127
@@ -28,9 +35,18 @@ params:
   w: -1.
   wa: 0.
   mnu: 0.06
+  mu0: 0.
+    #-1.23
+  sigma0: 0.
+    #-0.17
+  MG_flag: 1
+  pure_MG_flag: 2
+  musigma_par: 1
+  DE_model: 0
 
 k_max_extrap: 1000000.0
 k_min_extrap: 0.00001
 data_path: 
 use_noiseless_cls: True
 debug_mode: False
+

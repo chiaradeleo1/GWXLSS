@@ -3,6 +3,7 @@ from scipy.interpolate import interp1d
 from scipy.optimize    import minimize
 from scipy.integrate   import quad,trapz
 from scipy.special     import erf
+import re
 
 class galaxy_distribution:
 
@@ -20,39 +21,25 @@ class galaxy_distribution:
                         'binned_dist': self.ni}
 
     def get_galdist(self,survey):
-
-        if survey == 'Euclid-10':
-            dNdz = interp1d(self.zgal,(self.zgal/(0.9/np.sqrt(2)))**2*np.exp(-(self.zgal/(0.9/np.sqrt(2)))**1.5),bounds_error=False,fill_value=0.)
-            self.Nbins = 10
-            self.zmin  = 0.001
-            self.zmax  = 3.
-
-            self.photo = {'fout': 0.1,
-                          'co': 1,
-                          'cb': 1,
-                          'sigma_o': 0.05,
-                          'sigma_b': 0.05,
-                          'zo': 0.1,
-                          'zb': 0.}
-
-        elif survey == 'Euclid-13':
-            dNdz = interp1d(self.zgal,(self.zgal/(0.9/np.sqrt(2)))**2*np.exp(-(self.zgal/(0.9/np.sqrt(2)))**1.5),bounds_error=False,fill_value=0.)
-            self.Nbins = 13
-            self.zmin  = 0.001
-            self.zmax  = 3.
-
-            self.photo = {'fout': 0.1,
-                          'co': 1,
-                          'cb': 1,
-                          'sigma_o': 0.05,
-                          'sigma_b': 0.05,
-                          'zo': 0.1,
-                          'zb': 0.}
-
+        dNdz = interp1d(self.zgal,(self.zgal/(0.9/np.sqrt(2)))**2*np.exp(-(self.zgal/(0.9/np.sqrt(2)))**1.5),bounds_error=False,fill_value=0.)
+        match = re.match(r'^Euclid-(\d+)$', survey) 
+        if match:
+            self.Nbins = int(match.group(1))  
         else:
-            print('not there yet')
+            raise ValueError(f"Invalid survey name: {survey}")
+        self.zmin  = 0.001
+        self.zmax  = 3.
+
+        self.photo = {'fout': 0.1,
+                        'co': 1,
+                        'cb': 1,
+                        'sigma_o': 0.05,
+                        'sigma_b': 0.05,
+                        'zo': 0.1,
+                        'zb': 0.}
 
         return dNdz
+        
 
     def ngal_photoz(self, z, i):
 

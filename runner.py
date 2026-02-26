@@ -22,10 +22,10 @@ warnings.filterwarnings('ignore')
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-info     = read(sys.argv[1])
+info = read(sys.argv[1])
 
 #MMmod: this needs to be changed to be able to use multiple likelihoods at once
-if list(info['sampler'].keys())[0] in ['mcmc','nautilus']:
+if list(info['sampler'].keys())[0] in ['mcmc','nautilus','evaluate']:
     likesets = deepcopy(info['likelihood']['LSS'])
     info['likelihood'] =  {'LSS': {'external': LSSlike,
                                    'data_path': likesets['data_path'],
@@ -35,16 +35,21 @@ if list(info['sampler'].keys())[0] in ['mcmc','nautilus']:
 
 #MMmod:
 #creating output folder if it doesn't exist
-directory = os.path.dirname(os.path.abspath(info['output']))
+if 'output' in info:
+    directory = os.path.dirname(os.path.abspath(info['output']))
 
-if not os.path.exists(directory):
-    os.makedirs(directory)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 if list(info['sampler'].keys())[0] == 'mcmc':
+    updated_info,sampler = run(info)
+elif list(info['sampler'].keys())[0] == 'evaluate':
+    info['sampler'] = {'evaluate': {'override': {k: v["ref"]["loc"] for k,v in info['params'].items() if isinstance(v, dict) and "ref" in v and "loc" in v["ref"]}}}
     updated_info,sampler = run(info)
 elif list(info['sampler'].keys())[0] == 'nautilus':
     nautilus = nautilus_interface(info)
 elif list(info['sampler'].keys())[0] == 'Fisher':
+    print('RUNNING FISHER MATRIX CODE')
     fishmat,info_dict  = run_fisher(info)
     fishmat.to_csv(info['output']+'_matrix.txt',sep='\t',header=True,index=False)
     np.save(info['output']+'_info.npy',info_dict)

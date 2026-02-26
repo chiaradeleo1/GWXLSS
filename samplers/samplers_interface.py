@@ -46,16 +46,18 @@ def nautilus_interface(info):
     print('Loaded prior into Nautilus with dimension',prior.dimensionality())
     print('Prior keys: ',prior.keys)
 
-    derived_pars = [k for k in info['params'].keys() if type(info['params'][k]) == dict and 'prior' not in info['params'][k]]
+    derived_pars = [k for k in info['params'].keys() if type(info['params'][k]) == dict and 'prior' not in info['params'][k]]+['chi2']
     blob_vec     = [(par, float) for par in derived_pars]
 
     ## Likelihood
     def likelihood_nautilus(param_dict):
 
-        derived_params = model.logposterior(param_dict).derived
+        logpost        = model.logposterior(param_dict)
+        derived_params = logpost.derived
+        chi2           = -2*logpost.loglike
 
 
-        like_tuple    = [model.logposterior(param_dict).loglike]+[par for par in derived_params]
+        like_tuple    = [model.logposterior(param_dict).loglike]+[par for par in derived_params]+[chi2]
         full_tuple    = tuple(like_tuple)
 
         return full_tuple 
@@ -73,8 +75,8 @@ def nautilus_interface(info):
     points, log_w, log_l, derived = sampler.posterior(equal_weight=True,return_blobs=True)
     derived_array = np.array([np.array(list(der)) for der in derived])
 
-    params_dict = {par: info['params'][par]['latex'] for par in info['params'] if type(info['params'][par]) == dict}
-    nautilus_dict = {'params': {par: info['params'][par] for par in info['params'] if type(info['params'][par]) == dict}} | {'theory': info['theory']}
+    params_dict = {par: info['params'][par]['latex'] for par in info['params'] if type(info['params'][par]) == dict} | {'chi2': '\chi^2'}
+    nautilus_dict = {'params': {par: info['params'][par] for par in info['params'] if type(info['params'][par]) == dict} | {'chi2': {'latex': '\chi^2'}}}
 
     if 'output' in info:
         with open(info['output']+'.params.yaml', 'w') as outfile:
@@ -93,6 +95,9 @@ def nautilus_interface(info):
 
 def run_fisher(info):
 
+    from source_code.galdist import galaxy_distribution
+    from source_code.gwdist import gw_distribution
+
     possible_observables = ['GC','WL','GWC', 'GWWL' ]
     
     lmin = np.log10(info['analysis_settings']['lmin'])
@@ -108,26 +113,79 @@ def run_fisher(info):
     ells     = np.array([int(ell) for ell in 0.5*(ell_lims[:-1]+ell_lims[1:])])
     deltas   = (ell_lims[1:]-ell_lims[:-1]) #evaluation of the amplitude of each bin
 
-    distributions = np.load(info['analysis_settings']['dist_path'],allow_pickle=True).item()
-    for obs in distributions.keys():
-            if obs not in possible_observables:
-                sys.exit( "Unknown observable in source distribution file: {}. Possible observables are: "
-                "photometric Galaxy clustering (GC), galaxy Weak Lensing (WL), "
-                "Gravitational Waves Weak Lensing (GWWL), and Gravitational Waves Counts (GWC)".format(obs))
 
+    #GENERATING SOURCE DISTRIBUTIONS
+    print('Creating source distributions')
+    observables = info['analysis_settings']['observables']
+
+    #MMmod: to be changed to work only with GW only?#####
     galaxy_specs  = info['analysis_settings']['galaxy_specs']
-    if 'GWWL' in distributions or 'GWC' in distributions:
-        GW_specs = info['analysis_settings']['GW_specs']
+
+    if 'GWWL' in observables or 'GWC' in observables:
+        GW_specs = info['analysis_settings']['gw_specs']
     else:
         GW_specs = {}
+    #####################################################
+
+    for obs in observables:
+        if obs not in possible_observables:
+            sys.exit( "Unknown observable in source distribution file: {}. Possible observables are: "
+                      "photometric Galaxy clustering (GC), galaxy Weak Lensing (WL), "
+                      "Gravitational Waves Weak Lensing (GWWL), and Gravitational Waves Counts (GWC)".format(obs))
+    distributions = {}
+
+    if 'GC' in observables:
+        dist = galaxy_distribution(survey='Euclid-10')#MMmod: allow for different galaxy binning?
+        bin_lims = dist.galdict['bin_lims']
+        bin_mids = 0.5*(bin_lims[:-1]+bin_lims[1:])
+        Nbins_gc = len(bin_lims)-1
+
+        distributions['GC'] = {'dist': dist.galdict['binned_dist'],
+                               'Nbins': Nbins_gc,
+                               'zmean': bin_mids}
+
+    if 'WL' in observables:
+        dist = galaxy_distribution(survey='Euclid-10')
+        bin_lims = dist.galdict['bin_lims']
+        bin_mids = 0.5*(bin_lims[:-1]+bin_lims[1:])
+        Nbins_wl = len(bin_lims)-1
+
+        distributions['WL'] = {'dist': dist.galdict['binned_dist'],
+                               'Nbins': Nbins_wl,
+                               'zmean': bin_mids}
+
+    if 'GWC' in observables:
+
+        gwdist  = gw_distribution('ET-{}'.format(GW_specs['Nbins_GW']))
+
+
+        bin_lims = gwdist.gwdict['bin_lims']
+        bin_mids = 0.5*(bin_lims[:-1]+bin_lims[1:])
+        Nbins_gwc = len(bin_lims)-1
+
+        distributions['GWC'] = {'dist': gwdist.gwdict['binned_dist'],
+                                'Nbins': Nbins_gwc,
+                                'zmean': bin_mids}
+    if 'GWWL' in observables:
+        gwdist  = gw_distribution('ET-{}'.format(GW_specs['Nbins_GW']))
+
+
+        bin_lims = gwdist.gwdict['bin_lims']
+        bin_mids = 0.5*(bin_lims[:-1]+bin_lims[1:])
+        Nbins_gwl = len(bin_lims)-1
+
+        distributions['GWWL'] = {'dist': gwdist.gwdict['binned_dist'],
+                                 'Nbins': Nbins_gwl,
+                                'zmean': bin_mids}
     
     free_params = info['sampler']['Fisher']['freepars']
-    covmat_type = info['sampler']['Fisher']['covmat']
 
     fiducial = {par: pardict['fiducial'] for par,pardict in free_params.items()} | info['sampler']['Fisher']['fixedpars']
+    dertype  = info['sampler']['Fisher']['derivative'] 
 
     from source_code.fisher import get_Fisher
-    fishmat = get_Fisher(fiducial,free_params,ells,deltas,distributions,obs_settings,galaxy_specs,GW_specs,covmat_type).fisher_matrix()
+    fishmodule = get_Fisher(fiducial,free_params,ells,deltas,distributions,obs_settings,galaxy_specs,GW_specs,dertype)
+    fishmat    = fishmodule.fisher_matrix()
 
     fisher = pd.DataFrame(fishmat,columns=free_params.keys(),index=free_params.keys())
     params_info = {par: val for par,val in free_params.items()}
