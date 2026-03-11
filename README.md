@@ -43,9 +43,6 @@ make clean
 make 
 cd ..
 python setup.py build
-cd ..
-
-
 ```
 ## Data
 
