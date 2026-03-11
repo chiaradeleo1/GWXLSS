@@ -6,7 +6,7 @@ likelihood:
     data_path: ./mock_data/new_LSS_GW_LCDM
     debug_mode: False
     settings:
-      case: simple
+      case: 
       extra: 
       obs_used: ['GC', 'WL', 'GWC', 'GWWL']
       camb_path:

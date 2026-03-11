@@ -23,16 +23,20 @@ class LSSlike(Likelihood):
         
         self.feedback=self.debug_mode
         if self.use_noiseless_cls:
-            print('Using noiseless Cls')
+            print('\033[1;32m' + 'Using noiseless Cls' + '\033[0m')           
             self.data_Cls     = pd.read_csv(self.data_path+'_Cls_noiseless.dat',sep='\s+',header=0)
         else:
+            print('\033[1;32m' + 'Using noisy Cls' + '\033[0m')           
             self.data_Cls     = pd.read_csv(self.data_path+'_Cls_noisy.dat',sep='\s+',header=0)
 
         self.data_ells    = self.data_Cls['ells']
         self.covmat      = np.load(self.data_path+'_covmat.npy',allow_pickle=True).item()
         self.observables = np.load(self.data_path+'_source_distribution.npy',allow_pickle=True).item()
         self.obs_used = self.settings['obs_used']
-        print('Observables used:', self.obs_used)
+        print('\033[1;32m' + f'Observables used: {self.obs_used}' + '\033[0m')
+        if self.settings['cases'] is not None:  
+            print('\033[38;5;208m' + f"You are adding the following contributions to the source terms: {self.settings['cases']}. "
+      "This part of the code is still under validation, so please be careful." + '\033[0m')
         cov_cut = {}
         invcov = {}
         '''CDL: First masking of the data. We generate a single dataset containing the full LSSxGW. Here we mask the data and the
