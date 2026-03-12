@@ -7,7 +7,7 @@
 * **GWC:** Gravitational Wave Clustering
 * **GWWL:** Gravitational Wave Weak Lensing
 
-To utilize the full LSSxGW cross-correlation, it is necessary to use [**GW-MGCAMB**](https://github.com/chiaradeleo1/GW-MGCAMB), a modified version of MGCAMB where we implemented the source terms for Gravitational Waves.
+To utilize the full LSSxGW cross-correlation, it is necessary to use the latest version of [**MGCAMB**](https:/https://github.com/sfu-cosmo/MGCAMB), where the source terms for Gravitational Waves where included.
 
 ---
 
@@ -36,14 +36,8 @@ git clone https://github.com/chiaradeleo1/GWxLSS.git
 cd GWxLSS
 # Install dependencies
 pip install -r requirements.txt 
-# Install GW-MGCAMB (required for GW observables)
-git clone https://github.com/chiaradeleo1/GW-MGCAMB.git
-cd GW-MGCAMB/fortran
-make clean
-make 
-cd ..
-python setup.py build
 ```
+Then install MGCAMB (required for GW observables)
 ## Data
 
 The raw data are not included in this repository. Please refer to the following guide to manage your datasets:
