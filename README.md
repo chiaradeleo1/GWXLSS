@@ -65,12 +65,29 @@ Each YAML settings file must define the following parameters to ensure the likel
 
 - `sampler`: Choose the sampling method: `nautilus` (examples available in paper_settings/), `mcmc`, `Fisher` (examples available in paper_settings/ and Example.ipynb)
 
-**Reproducing Paper Results**: To reproduce the results in [arXiv:2512.19186](https://arxiv.org/2512.19186), follow these steps:
-    1. **Download Data**: Download the synthetic data provided on [Zenodo (link)].
+**Reproducing Paper Results**: To reproduce the results in [De Leo et. al 2026](https://iopscience.iop.org/article/10.1088/1475-7516/2026/05/038), follow these steps:
+    1. **Download Data**: Download the synthetic data provided on [Zenodo (https://zenodo.org/uploads/20267969)].
     2. **Access Chains**: The chains used in the paper are also available on Zenodo.
-    3. **Use Settings**: Utilize the input files located in the `paper_settings/` folder to run your analysis.
-## Citation
-If you use this code, please cite:
+    3. **Use Settings**: Use the input files located in the `paper_settings/` folder to run your analysis.
+---
 
-C. De Leo et al., Illuminating the Dark Sector: Understanding Modified Gravity Signatures with Cross-Correlations of Gravitational Waves and Large-Scale Structure, [Link].
+# Citation
 
+If you use this code in your work, please cite:
+
+```bibtex
+@article{De Leo_2026,
+doi = {10.1088/1475-7516/2026/05/038},
+url = {https://doi.org/10.1088/1475-7516/2026/05/038},
+year = {2026},
+month = {may},
+publisher = {IOP Publishing},
+volume = {2026},
+number = {05},
+pages = {038},
+author = {De Leo, C. and Cañas-Herrera, G. and Balaudo, A. and Martinelli, M. and Silvestri, A. and Baker, T.},
+title = {Illuminating the dark sector: understanding modified gravity signatures with cross-correlations of Gravitational Waves and Large-Scale Structure},
+journal = {Journal of Cosmology and Astroparticle Physics},
+}
+
+```
