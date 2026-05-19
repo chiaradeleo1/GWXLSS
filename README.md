@@ -66,8 +66,11 @@ Each YAML settings file must define the following parameters to ensure the likel
 - `sampler`: Choose the sampling method: `nautilus` (examples available in paper_settings/), `mcmc`, `Fisher` (examples available in paper_settings/ and Example.ipynb)
 
 **Reproducing Paper Results**: To reproduce the results in [De Leo et. al 2026](https://iopscience.iop.org/article/10.1088/1475-7516/2026/05/038), follow these steps:
-    1. **Download Data**: Download the synthetic data provided on [Zenodo (https://zenodo.org/uploads/20267969)].
+
+    1. **Download Data**: Download the synthetic data provided on [Zenodo] (https://zenodo.org/uploads/20267969).
+    
     2. **Access Chains**: The chains used in the paper are also available on Zenodo.
+    
     3. **Use Settings**: Use the input files located in the `paper_settings/` folder to run your analysis.
 ---
 
