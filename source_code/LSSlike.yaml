@@ -2,8 +2,7 @@ aliases: [LSS]
 speed: 500
 
 settings:
-  case: simple
-  calculation: CAMB
+  cases: 
   extra: 
   camb_path: 
   scale_cut:
@@ -36,9 +35,7 @@ params:
   wa: 0.
   mnu: 0.06
   mu0: 0.
-    #-1.23
   sigma0: 0.
-    #-0.17
   MG_flag: 1
   pure_MG_flag: 2
   musigma_par: 1

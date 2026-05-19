@@ -1,27 +1,35 @@
-debug: False
+output: chains/muSigmaCDM_3x2pt+GW
+force: True
 likelihood:
   LSS: 
     external: LSSlike
     data_path: ./mock_data/new_LSS_GW_LCDM
-    obs_used: ['GC', 'WL']
     debug_mode: False
     settings:
-      case: simple
-      calculation: CAMB
-      extra: 
-      camb_path: /home/Matteo/Codes/GW-MGCAMB
+      case: 
+      extra:       
+      obs_used: ['GC', 'WL', 'GWC', 'GWWL']
+      camb_path:
+      scale_cut:
+        method: ell_cut_like
+        value: 200
     use_noiseless_cls: True
 
 sampler:
-  evaluate: 
+  nautilus:
+    num_threads: 1
+    pool: 10
+    n_live: 10000
+    n_batch: 512
+    n_networks: 16
 
 params:
   ombh2:
     latex: '\Omega_\mathrm{b} h^2'
     prior:
       dist: norm
-      loc: 0.0227
-      scale: 0.0038
+      loc: 0.0224455
+      scale: 0.0031
     proposal: 0.0001
     ref:
       dist: norm
@@ -56,7 +64,7 @@ params:
       scale: 0.79
     prior:
       min: 62.27
-      max: 71.75
+      max: 80.0 
 
   logA:
     drop: true
@@ -88,50 +96,55 @@ params:
     ref:
       dist: norm
       loc: -0.007589
-      scale: 0.00022
+      scale: 0.00015
     prior:
-      min: -0.00891
-      max: -0.00627
+      dist: norm
+      loc: -0.007589
+      scale: 0.00015
 
   a1:
     latex: a_1
     ref:
       dist: norm
       loc: 0.002008
-      scale: 0.0012
+      scale: 0.00004
     prior:
-      min: -0.0052
-      max: 0.0092
+      dist: norm
+      loc: 0.002008
+      scale: 0.00004
 
   a2:
     latex: a_2
     ref:
       dist: norm
       loc: -0.004127
-      scale: 0.0023
+      scale: 0.00008
     prior:
-      min: -0.0179
-      max: 0.0097
+      dist: norm
+      loc: -0.004127
+      scale: 0.00008
 
   a3:
     latex: 'a_3'
     ref:
       dist: norm
       loc: 0.002918
-      scale: 0.0018
+      scale: 0.00006
     prior:
-      min: -0.0089
-      max: 0.0147
+      dist: norm
+      loc: 0.002918
+      scale: 0.00006
 
   a4:
     latex: 'a_4'
     ref:
       dist: norm
       loc: -0.0006784
-      scale: 0.00042
+      scale: 0.000013
     prior:
-      min: -0.0032
-      max: 0.00184
+      dist: norm
+      loc: -0.0006784
+      scale: 0.000013
 
   b0_poly:
     latex: 'b_0'
@@ -172,7 +185,47 @@ params:
     prior:
       min: 0.4065
       max: 0.4401
+  
+  b0_poly_GW:
+    latex: 'b_0^{\rm GW}'
+    ref:
+      dist: norm
+      loc: 0.830703
+      scale: 0.0034
+    prior:
+      min: -2. 
+      max: 2. 
 
+  b1_poly_GW:
+    latex: 'b_1^{\rm GW}'
+    ref:
+      dist: norm
+      loc: 1.190547
+      scale: 0.0082
+    prior:
+      min: -2. 
+      max: 2.
+
+  b2_poly_GW:
+    latex: 'b_2^{\rm GW}'
+    ref:
+      dist: norm
+      loc: -0.928357
+      scale: 0.0089
+    prior:
+      min: -2. 
+      max: 2. 
+
+  b3_poly_GW:
+    latex: 'b_3^{\rm GW}'
+    ref:
+      dist: norm
+      loc: 0.423292
+      scale: 0.0028
+    prior:
+      min: -2. 
+      max: 2. 
+  
   mu0:
     latex: '\mu_0'
     ref:
@@ -192,11 +245,7 @@ params:
     prior:
       min: -0.36
       max: 0.24
-
-  b0_poly_GW: 0.830703
-  b1_poly_GW: 1.190547
-  b2_poly_GW: -0.928357
-  b3_poly_GW: 0.423292
+      
   w: -1.
   wa: 0.
   mnu: 0.06

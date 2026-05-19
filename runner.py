@@ -22,6 +22,10 @@ warnings.filterwarnings('ignore')
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
+if len(sys.argv) < 2:
+    sys.exit('\033[1;31m' + 'ERROR! MISSING ARGUMENT! '  + 
+             f"You must provide a settings file. Example:\n"
+             f"python runner.py settings_filename.yaml"+ '\033[0m')
 info = read(sys.argv[1])
 
 #MMmod: this needs to be changed to be able to use multiple likelihoods at once

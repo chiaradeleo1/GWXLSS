@@ -1,24 +1,11 @@
-output: chains/LCDM_3x2pt+GWC_fisher
+output: chains/muSigmaCDM_3x2pt+GWC_fisher
 force: True
-likelihood:
-  LSS: 
-    external: LSSlike
-    data_path: ./mock_data/new_LSS_GW_LCDM
-    obs_used: ['GC', 'WL', 'GWC']
-    debug_mode: False
-    settings:
-      case: simple
-      calculation: CAMB
-      extra: 
-      camb_path:
-    use_noiseless_cls: False
 
 obs_settings:
-  case: simple
-  calculation: CAMB
+  cases: 
   extra: 
   camb_path:
-  obs_used: ['GC', 'WL', 'GWC']
+  obs_used: [GC,WL,GWC]
 
 analysis_settings:
   #These settings are needed by the Fisher matrix module to create 
@@ -127,6 +114,14 @@ sampler:
         fiducial: 0.423292
         variation: 0.1
         latex: b_3^{GW}
+      mu0:
+        fiducial: 0.
+        variation: 0.1
+        latex: \mu_0
+      sigma0:
+        fiducial: 0.
+        variation: 0.1
+        latex: \Sigma_0
 
 
     fixedpars:
@@ -135,8 +130,6 @@ sampler:
       wa: 0.
       mnu: 0.06
       #MG params
-      mu0: 0.
-      sigma0: 0.
       MG_flag: 1
       pure_MG_flag: 2
       musigma_par: 1

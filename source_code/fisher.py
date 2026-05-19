@@ -27,6 +27,9 @@ class get_Fisher:
         self.param_values = [obs_settings['extra'][name] if name in self.obs_settings['extra'] else fiducial[name] for name in self.param_names]
         self.param_deltas = [free_params[name]['variation'] for name in self.param_names]
         self.dertype      = dertype
+        if self.obs_settings['cases'] is not None:
+                print('\033[38;5;208m' + f"You are adding the following contributions to the source terms: {self.obs_settings['cases']}. "
+      "This part of the code is still under validation, so please be careful." + '\033[0m')
         
 
         #MMmod: this renaming is not really useful, but I wanted to preserve what is in compute obs
@@ -44,11 +47,11 @@ class get_Fisher:
         self.Nbins   = {new_obs: self.observables[obs]['Nbins'] for new_obs,obs in zip(self.renamed_obs,self.observables)}
         self.maxbins = max(list(self.Nbins.values()))
         print('')
-        print('Computing fiducial observables...')
+        print('\033[1;32m' + f'Computing fiducial observables ... ' + '\033[0m')
         tini = time()
         self.fidobs = get_obs(fiducial,self.observables,self.ells,self.obs_settings,feedback=False).Cls
         #MMmod: this renaming is not really useful, but I wanted to preserve what is in compute obs
-        print('...done in {:.2f} s'.format(time()-tini))
+        print('\033[1;32m' + ' ...done in {:.2f} s'.format(time()-tini) + '\033[0m')
 
 
 
@@ -60,7 +63,7 @@ class get_Fisher:
                     for param in self.param_names }
 
         for i, (param, delta) in enumerate(zip(self.param_names, self.param_deltas)):
-            print('...computing derivative for {}...'.format(param))
+            print('\033[1;32m' + '... computing derivative for {} ...'.format(param) + '\033[0m')
             fiducial_plus  = deepcopy(self.fiducial)
             fiducial_minus = deepcopy(self.fiducial)
             
@@ -232,15 +235,15 @@ class get_Fisher:
         
         Fisher = np.zeros((len(self.ells), len(self.param_names), len(self.param_names)))
         print('')
-        print('Computing covariance...')
+        print('\033[1;32m' + 'Computing covariance matrix ... ' + '\033[0m')
         tini = time()
         covmat = self.compute_covmat()
-        print('..done in {:.2f} s'.format(time()-tini))
+        print('\033[1;32m' + '... done in {:.2f} s'.format(time()-tini) + '\033[0m')
         print('')
-        print('Computing derivatives...')
+        print('\033[1;32m' + 'Computing derivatives ... ' + '\033[0m')
         tini = time()
         derivs = self.numerical_derivative()
-        print('...done in {:.2f} s'.format(time()-tini))
+        print('\033[1;32m' + '... done in {:.2f} s'.format(time()-tini) + '\033[0m')
 
         all_cols = self.columns_ordering()
 
