@@ -56,7 +56,7 @@ Each YAML settings file must define the following parameters to ensure the likel
 - likelihood_settings:
   - `data_path`: path/to/synthetic/data
   - `settings`:
-  - `case`: Define which relativistic effects to include:  ['redshift', 'lensing', 'velocity', 'potential', 'lsd', 'evolve', 'gradpotential', 'ISW', 'SW', 'volume']. If set to `None`, no additional effects are added.
+    - `case`: Define which relativistic effects to include:  ['redshift', 'lensing', 'velocity', 'potential', 'lsd', 'evolve', 'gradpotential', 'ISW', 'SW', 'volume']. If set to `None`, no additional effects are added.
     - `extra:` Extra arguments passed directly to CAMB.
     - `obs_used`: A list of the observables you want to use. The auto and cross-spectra not specified here are automatically removed from both the covariance matrix and the data vector (see `likelihood.py` for implementation details).
      - `scale_cut`: [`method`, `value`] If using any GW observables, you must specify the maximum multipole $\ell_{\rm max}$. **Note**: The code currently forces a single $\ell_{\rm max}$ for the analysis. Because galaxies are expected to have a higher $\ell_{\rm max}$, theoretical values are computed up to the galaxy limit, and all auto and cross-spectra involving GWs are subsequently cut at your specified $\ell_{\rm max}$.
