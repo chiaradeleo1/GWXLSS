@@ -50,7 +50,7 @@ All analyses are controlled via a YAML settings file. You can execute a run usin
 ```bash
 python runner.py settings_file.yaml
 ```
-Each YAML settings file must define the following parameters to ensure the likelihood and theory modules function correctly:
+Each YAML settings file must define the following parameters to ensure the likelihood and theory modules work correctly:
 - `output`: name of the output file
 
 - likelihood_settings:
